@@ -25,7 +25,7 @@ import {
   Home as HomeIcon,
 } from 'lucide-react';
 import { CATEGORIES } from '@/lib/diagnosticEngine';
-import { saveSession } from '@/lib/storage';
+import { saveSession, getAppSettings } from '@/lib/storage';
 import {
   EquipmentCategory,
   DiagnosticSession,
@@ -57,6 +57,7 @@ function DiagnoseContent() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [timerSeconds, setTimerSeconds] = useState<number>(0);
   const [timerActive, setTimerActive] = useState<boolean>(false);
+  const [activeModel, setActiveModel] = useState<string>('Google Gemma-2-9B');
 
   useEffect(() => {
     const demo = searchParams.get('demo');
@@ -143,6 +144,13 @@ function DiagnoseContent() {
     setTimerSeconds(0);
     setTimerActive(true);
 
+    const appSettings = getAppSettings();
+    const gemmaConfig = {
+      apiKey: appSettings.apiKey,
+      baseUrl: appSettings.apiEndpoint || 'http://localhost:11434',
+      model: appSettings.aiModel || 'gemma2-9b-it',
+    };
+
     try {
       const res = await fetch('/api/diagnose?action=start', {
         method: 'POST',
@@ -153,6 +161,7 @@ function DiagnoseContent() {
           problemDescription,
           structuredAnswers,
           photos,
+          gemmaConfig,
         }),
       });
 
@@ -160,6 +169,9 @@ function DiagnoseContent() {
       if (data.success && data.session) {
         setSession(data.session);
         saveSession(data.session);
+        if (data.aiModelUsed) {
+          setActiveModel(data.aiModelUsed);
+        }
 
         setTimeout(() => {
           setIsLoading(false);
@@ -182,6 +194,13 @@ function DiagnoseContent() {
     if (!session || !session.currentStep) return;
 
     setIsLoading(true);
+    const appSettings = getAppSettings();
+    const gemmaConfig = {
+      apiKey: appSettings.apiKey,
+      baseUrl: appSettings.apiEndpoint || 'http://localhost:11434',
+      model: appSettings.aiModel || 'gemma2-9b-it',
+    };
+
     try {
       const res = await fetch('/api/diagnose?action=step', {
         method: 'POST',
@@ -190,6 +209,7 @@ function DiagnoseContent() {
           session,
           userResponse: response,
           measurement,
+          gemmaConfig,
         }),
       });
 
@@ -198,6 +218,9 @@ function DiagnoseContent() {
         const updated = data.session;
         setSession(updated);
         saveSession(updated);
+        if (data.aiModelUsed) {
+          setActiveModel(data.aiModelUsed);
+        }
 
         if (updated.status === 'solved' || updated.status === 'technician_required') {
           setTimerActive(false);
@@ -608,6 +631,12 @@ function DiagnoseContent() {
               {session.initialAssessment || 'Troubleshooting Active'}
             </div>
 
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '6px' }}>
+              <span className="badge badge-solar" style={{ fontSize: '10px', padding: '2px 6px' }}>
+                {activeModel}
+              </span>
+            </div>
+
             <ConfidenceMeter confidence={session.confidence} showExplanation={false} />
           </div>
 
@@ -827,7 +856,7 @@ function DiagnoseContent() {
 
             {timerSeconds > 0 && (
               <div style={{ fontSize: '11px', color: '#ffffff', opacity: 0.8, fontFamily: 'var(--font-mono)', marginTop: '8px' }}>
-                Completed in {formatTimer(timerSeconds)}
+                Completed in {formatTimer(timerSeconds)} &bull; {activeModel}
               </div>
             )}
           </div>

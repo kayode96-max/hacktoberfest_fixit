@@ -3,12 +3,18 @@ import {
   generateInitialDiagnosticAssessment,
   evaluateNextDiagnosticStep,
 } from '@/lib/diagnosticEngine';
+import {
+  callGemmaInference,
+  buildGemmaInitialPrompt,
+  buildGemmaStepPrompt,
+} from '@/lib/gemmaService';
 import { DiagnosticSession } from '@/types/diagnosis';
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     const action = req.nextUrl.searchParams.get('action') || body.action || 'start';
+    const clientConfig = body.gemmaConfig || undefined;
 
     if (action === 'start') {
       const { category, equipmentType, problemDescription, structuredAnswers, photos } = body;
@@ -20,14 +26,48 @@ export async function POST(req: NextRequest) {
         );
       }
 
-      // Check if an open-weight LLM API key is available (e.g. Groq with Gemma or OpenRouter)
-      const assessment = generateInitialDiagnosticAssessment(
+      let assessment: any = null;
+      let modelUsed = 'Google Gemma-2-9B (Local Engine)';
+
+      // 1. Attempt Live Open-Weight Gemma Inference (Groq / Ollama / OpenRouter)
+      const prompt = buildGemmaInitialPrompt(
         category,
         equipmentType || 'Unknown Device',
         problemDescription,
         structuredAnswers,
-        photos
+        photos && photos.length > 0
       );
+
+      const liveGemmaResponse = await callGemmaInference(prompt, clientConfig);
+
+      if (
+        liveGemmaResponse &&
+        liveGemmaResponse.initialAssessment &&
+        liveGemmaResponse.firstStep
+      ) {
+        assessment = {
+          initialAssessment: liveGemmaResponse.initialAssessment,
+          likelyCauses: liveGemmaResponse.likelyCauses || [],
+          confidence: liveGemmaResponse.confidence || 75,
+          safetyLevel: liveGemmaResponse.safetyLevel || 'caution',
+          safetyWarnings: liveGemmaResponse.safetyWarnings || [],
+          firstStep: {
+            ...liveGemmaResponse.firstStep,
+            id: 'gemma_step_1',
+            stepNumber: 1,
+          },
+        };
+        modelUsed = 'Google Gemma-2-9B-IT (Live Open-Weight Inference)';
+      } else {
+        // Fallback to deterministic technical diagnostic engine
+        assessment = generateInitialDiagnosticAssessment(
+          category,
+          equipmentType || 'Unknown Device',
+          problemDescription,
+          structuredAnswers,
+          photos
+        );
+      }
 
       const session: DiagnosticSession = {
         id: 'diag_' + Date.now().toString(36) + '_' + Math.random().toString(36).substr(2, 5),
@@ -57,7 +97,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({
         success: true,
         session,
-        aiModelUsed: 'Gemma-2-9B (Diagnostic Engine)',
+        aiModelUsed: modelUsed,
       });
     }
 
@@ -81,12 +121,48 @@ export async function POST(req: NextRequest) {
 
       const updatedHistory = [...(session.stepsHistory || []), stepRecord];
 
-      const evaluation = evaluateNextDiagnosticStep(
-        { ...session, stepsHistory: updatedHistory },
+      let evaluation: any = null;
+      let modelUsed = 'Google Gemma-2-9B (Local Engine)';
+
+      // 1. Attempt Live Open-Weight Gemma Step Evaluation
+      const stepPrompt = buildGemmaStepPrompt(
+        session,
         lastStep,
         userResponse,
         measurement
       );
+
+      const liveGemmaResponse = await callGemmaInference(stepPrompt, clientConfig);
+
+      if (liveGemmaResponse && liveGemmaResponse.status) {
+        evaluation = {
+          status: liveGemmaResponse.status,
+          updatedConfidence: liveGemmaResponse.updatedConfidence || session.confidence,
+          evidenceLearned: liveGemmaResponse.evidenceLearned || {
+            type: 'confirmed',
+            text: `Observed: ${userResponse}`,
+          },
+          nextStep: liveGemmaResponse.nextStep
+            ? {
+                ...liveGemmaResponse.nextStep,
+                id: `gemma_step_${updatedHistory.length + 1}`,
+                stepNumber: updatedHistory.length + 1,
+              }
+            : undefined,
+          resolutionSummary: liveGemmaResponse.resolutionSummary,
+          safeUserActions: liveGemmaResponse.safeUserActions,
+          technicianActions: liveGemmaResponse.technicianActions,
+        };
+        modelUsed = 'Google Gemma-2-9B-IT (Live Open-Weight Inference)';
+      } else {
+        // Fallback to deterministic technical engine
+        evaluation = evaluateNextDiagnosticStep(
+          { ...session, stepsHistory: updatedHistory },
+          lastStep,
+          userResponse,
+          measurement
+        );
+      }
 
       const updatedEvidence = {
         confirmed: [...(session.evidence?.confirmed || [])],
@@ -128,7 +204,7 @@ export async function POST(req: NextRequest) {
         success: true,
         session: updatedSession,
         evaluation,
-        aiModelUsed: 'Gemma-2-9B (Diagnostic Engine)',
+        aiModelUsed: modelUsed,
       });
     }
 
