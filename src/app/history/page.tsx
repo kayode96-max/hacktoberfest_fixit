@@ -7,14 +7,10 @@ import {
   Search,
   Trash2,
   ChevronRight,
-  Filter,
   PlusCircle,
-  Clock,
-  Sparkles,
-  RotateCcw,
 } from 'lucide-react';
 import { getStoredSessions, deleteSession } from '@/lib/storage';
-import { DiagnosticSession, EquipmentCategory } from '@/types/diagnosis';
+import { DiagnosticSession } from '@/types/diagnosis';
 
 export default function HistoryPage() {
   const [sessions, setSessions] = useState<DiagnosticSession[]>([]);
@@ -50,49 +46,49 @@ export default function HistoryPage() {
   const getStatusBadge = (status: DiagnosticSession['status']) => {
     switch (status) {
       case 'solved':
-        return <span className="badge badge-solved">🟢 Solved</span>;
+        return <span className="badge badge-solved">Solved</span>;
       case 'technician_required':
-        return <span className="badge badge-tech">🔴 Tech Required</span>;
+        return <span className="badge badge-tech">Tech Required</span>;
       default:
-        return <span className="badge badge-continue">🟡 In Progress</span>;
+        return <span className="badge badge-continue">In Progress</span>;
     }
   };
 
   return (
     <div style={{ maxWidth: '640px', margin: '0 auto' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
         <div>
-          <h1 style={{ fontSize: '20px', fontWeight: 800 }}>Diagnosis History</h1>
+          <h1 style={{ fontSize: '18px', fontWeight: 800 }}>Diagnosis History</h1>
           <p style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
             Review past troubleshooting sessions and repair logs
           </p>
         </div>
 
-        <Link href="/diagnose" className="btn btn-primary" style={{ padding: '8px 12px', fontSize: '13px' }}>
-          <PlusCircle size={15} />
+        <Link href="/diagnose" className="btn btn-primary" style={{ padding: '6px 12px', fontSize: '12px', minHeight: '32px' }}>
+          <PlusCircle size={14} />
           <span>New</span>
         </Link>
       </div>
 
       {/* Search Bar */}
-      <div className="form-group" style={{ position: 'relative', marginBottom: '12px' }}>
+      <div className="form-group" style={{ position: 'relative', marginBottom: '10px' }}>
         <input
           type="text"
-          placeholder="Search by equipment, symptom, or cause..."
+          placeholder="Search equipment, symptom, or cause..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           className="form-input"
-          style={{ paddingLeft: '36px' }}
+          style={{ paddingLeft: '34px' }}
         />
         <Search
-          size={16}
+          size={15}
           color="var(--text-muted)"
-          style={{ position: 'absolute', left: '12px', top: '14px' }}
+          style={{ position: 'absolute', left: '12px', top: '13px' }}
         />
       </div>
 
       {/* Category Filter Pills */}
-      <div style={{ display: 'flex', gap: '6px', overflowX: 'auto', paddingBottom: '8px', marginBottom: '14px' }}>
+      <div style={{ display: 'flex', gap: '6px', overflowX: 'auto', paddingBottom: '6px', marginBottom: '12px' }}>
         {[
           { id: 'all', label: 'All Equipment' },
           { id: 'solar', label: '☀️ Solar' },
@@ -108,9 +104,9 @@ export default function HistoryPage() {
             style={{
               padding: '4px 10px',
               fontSize: '11px',
-              minHeight: '30px',
+              minHeight: '28px',
               whiteSpace: 'nowrap',
-              borderRadius: '9999px',
+              borderRadius: 'var(--radius-sm)',
             }}
           >
             {item.label}
@@ -120,30 +116,30 @@ export default function HistoryPage() {
 
       {/* Sessions List */}
       {filtered.length === 0 ? (
-        <div className="fix-card" style={{ textAlign: 'center', padding: '36px 16px' }}>
-          <HistoryIcon size={32} color="var(--text-muted)" style={{ margin: '0 auto 10px auto' }} />
-          <h3 style={{ fontSize: '15px', fontWeight: 700, marginBottom: '4px' }}>No Diagnoses Found</h3>
+        <div className="fix-card" style={{ textAlign: 'center', padding: '32px 16px' }}>
+          <HistoryIcon size={28} color="var(--text-muted)" style={{ margin: '0 auto 8px auto' }} />
+          <h3 style={{ fontSize: '14px', fontWeight: 700, marginBottom: '4px' }}>No Diagnoses Found</h3>
           <p style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
             No sessions match your search or filter.
           </p>
         </div>
       ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
           {filtered.map((s) => (
             <Link
               key={s.id}
               href={`/diagnosis/${s.id}`}
               className="fix-card interactive"
-              style={{ margin: 0, padding: '14px 16px' }}
+              style={{ margin: 0, padding: '12px 14px' }}
               id={`history-item-${s.id}`}
             >
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '6px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
                 <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
                   <span className={`badge badge-${s.category}`}>{s.category.toUpperCase()}</span>
                   {getStatusBadge(s.status)}
                 </div>
 
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                   <span style={{ fontSize: '11px', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>
                     {new Date(s.createdAt).toLocaleDateString()}
                   </span>
@@ -151,15 +147,15 @@ export default function HistoryPage() {
                     type="button"
                     onClick={(e) => handleDelete(e, s.id)}
                     className="icon-btn"
-                    style={{ width: '28px', height: '28px', border: 'none', background: 'transparent' }}
+                    style={{ width: '26px', height: '26px', border: 'none', background: 'transparent' }}
                     title="Delete record"
                   >
-                    <Trash2 size={14} color="var(--text-muted)" />
+                    <Trash2 size={13} color="var(--text-muted)" />
                   </button>
                 </div>
               </div>
 
-              <div style={{ fontSize: '15px', fontWeight: 700, marginBottom: '3px' }}>
+              <div style={{ fontSize: '14px', fontWeight: 700, marginBottom: '2px' }}>
                 {s.equipmentType}
               </div>
 
@@ -170,17 +166,17 @@ export default function HistoryPage() {
                   overflow: 'hidden',
                   textOverflow: 'ellipsis',
                   whiteSpace: 'nowrap',
-                  marginBottom: '8px',
+                  marginBottom: '6px',
                 }}
               >
                 {s.problemDescription}
               </div>
 
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '11px', color: 'var(--text-muted)' }}>
-                <span>{s.stepsHistory.length} check(s) performed &bull; {s.confidence}% confidence</span>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '2px', color: 'var(--accent-cyan)' }}>
+                <span>{s.stepsHistory.length} test(s) &bull; {s.confidence}% confidence</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '2px', color: 'var(--emerald-primary)' }}>
                   <span>View Details</span>
-                  <ChevronRight size={14} />
+                  <ChevronRight size={13} />
                 </div>
               </div>
             </Link>

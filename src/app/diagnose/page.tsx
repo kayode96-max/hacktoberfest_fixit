@@ -10,13 +10,10 @@ import {
   X,
   CheckCircle2,
   AlertTriangle,
-  Play,
   RotateCcw,
   ShieldAlert,
   ShieldCheck,
   ChevronRight,
-  Zap,
-  HelpCircle,
   Clock,
   Sparkles,
   Info,
@@ -24,13 +21,10 @@ import {
   BookmarkCheck,
 } from 'lucide-react';
 import { CATEGORIES } from '@/lib/diagnosticEngine';
-import { saveSession, getSessionById } from '@/lib/storage';
+import { saveSession } from '@/lib/storage';
 import {
   EquipmentCategory,
   DiagnosticSession,
-  DiagnosticStep,
-  PossibleCause,
-  SafetyLevel,
 } from '@/types/diagnosis';
 import ConfidenceMeter from '@/components/ConfidenceMeter';
 import SafetyBanner from '@/components/SafetyBanner';
@@ -40,13 +34,10 @@ function DiagnoseContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  // Wizard Phases:
-  // 'category' -> 'equipment' -> 'description' -> 'photos' -> 'analyzing' -> 'troubleshooting' -> 'result'
   const [phase, setPhase] = useState<
     'category' | 'equipment' | 'description' | 'photos' | 'analyzing' | 'troubleshooting' | 'result'
   >('category');
 
-  // Input states
   const [selectedCategory, setSelectedCategory] = useState<EquipmentCategory>('solar');
   const [equipmentType, setEquipmentType] = useState<string>('');
   const [problemDescription, setProblemDescription] = useState<string>('');
@@ -57,15 +48,12 @@ function DiagnoseContent() {
     whenStarted: 'Today',
   });
   const [photos, setPhotos] = useState<string[]>([]);
-  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
 
-  // Active Session & AI State
   const [session, setSession] = useState<DiagnosticSession | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [timerSeconds, setTimerSeconds] = useState<number>(0);
   const [timerActive, setTimerActive] = useState<boolean>(false);
 
-  // Check URL query parameters for demo or category preselect
   useEffect(() => {
     const demo = searchParams.get('demo');
     const cat = searchParams.get('category') as EquipmentCategory;
@@ -82,9 +70,8 @@ function DiagnoseContent() {
         workedPreviously: 'Yes',
         whenStarted: 'Today',
       });
-      // Preload sample visual reference
       setPhotos([
-        'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="200" viewBox="0 0 300 200"><rect width="100%" height="100%" fill="%231e293b"/><text x="50%" y="45%" fill="%2338bdf8" font-family="sans-serif" font-weight="bold" font-size="16" text-anchor="middle">☀️ Solar Input Port Connected</text><text x="50%" y="65%" fill="%2394a3b8" font-family="sans-serif" font-size="13" text-anchor="middle">LCD Input: 0 Watts (No DC Flow)</text></svg>',
+        'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="200" viewBox="0 0 300 200"><rect width="100%" height="100%" fill="%23050505"/><rect x="40" y="40" width="220" height="120" rx="4" fill="%23111111" stroke="%2310b981" stroke-width="1"/><text x="150" y="85" fill="%23a1a1aa" font-family="sans-serif" font-size="12" text-anchor="middle">Solar Input Port</text><text x="150" y="115" fill="%2310b981" font-family="monospace" font-weight="bold" font-size="20" text-anchor="middle">INPUT: 0W</text></svg>',
       ]);
       setPhase('photos');
     } else if (cat && ['solar', 'electrical', 'electronics', 'appliances'].includes(cat)) {
@@ -93,7 +80,6 @@ function DiagnoseContent() {
     }
   }, [searchParams]);
 
-  // Elapsed timer tracking for the session
   useEffect(() => {
     let interval: any;
     if (timerActive) {
@@ -123,7 +109,6 @@ function DiagnoseContent() {
       reader.onload = (event) => {
         const result = event.target?.result as string;
         setPhotos((prev) => [...prev, result]);
-        setPhotoPreview(result);
       };
       reader.readAsDataURL(files[0]);
     }
@@ -131,7 +116,7 @@ function DiagnoseContent() {
 
   const addSamplePhoto = () => {
     const sample =
-      'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="200" viewBox="0 0 300 200"><rect width="100%" height="100%" fill="%230f172a"/><rect x="40" y="40" width="220" height="120" rx="8" fill="%231e293b" stroke="%2338bdf8" stroke-width="2"/><text x="150" y="95%" fill="%2394a3b8" font-size="12" text-anchor="middle">Reference Test Equipment</text><text x="150" y="105" fill="%2338bdf8" font-family="monospace" font-size="18" text-anchor="middle">INPUT: 0W</text></svg>';
+      'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="200" viewBox="0 0 300 200"><rect width="100%" height="100%" fill="%230a0a0a"/><rect x="40" y="40" width="220" height="120" rx="4" fill="%23141414" stroke="%2310b981" stroke-width="1"/><text x="150" y="85" fill="%2371717a" font-family="sans-serif" font-size="12" text-anchor="middle">Equipment Reference</text><text x="150" y="115" fill="%2310b981" font-family="monospace" font-size="18" text-anchor="middle">DISPLAY: 0W</text></svg>';
     setPhotos((prev) => [...prev, sample]);
   };
 
@@ -159,23 +144,20 @@ function DiagnoseContent() {
         setSession(data.session);
         saveSession(data.session);
 
-        // Transition to troubleshooting
         setTimeout(() => {
           setIsLoading(false);
           setPhase('troubleshooting');
-        }, 800);
+        }, 700);
       } else {
         throw new Error(data.error || 'Failed to start diagnosis');
       }
     } catch (e) {
       console.error(e);
       setIsLoading(false);
-      // Fallback local recovery
       setPhase('troubleshooting');
     }
   };
 
-  // User submits an answer to a troubleshooting step
   const handleStepResponse = async (
     response: string,
     measurement?: { voltage?: number; current?: number; unit?: string }
@@ -233,12 +215,12 @@ function DiagnoseContent() {
           className="icon-btn"
           title="Back"
         >
-          <ArrowLeft size={18} />
+          <ArrowLeft size={16} />
         </button>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <span style={{ fontSize: '11px', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>
-            FixIt AI Session
+            Diagnosis Flow
           </span>
           {timerActive && (
             <span
@@ -248,10 +230,11 @@ function DiagnoseContent() {
                 gap: '4px',
                 fontSize: '11px',
                 fontFamily: 'var(--font-mono)',
-                color: 'var(--accent-cyan)',
-                background: 'rgba(0, 210, 255, 0.1)',
+                color: 'var(--emerald-light)',
+                background: 'var(--emerald-subtle)',
+                border: '1px solid var(--emerald-border)',
                 padding: '2px 6px',
-                borderRadius: '4px',
+                borderRadius: 'var(--radius-sm)',
               }}
             >
               <Clock size={11} />
@@ -265,7 +248,7 @@ function DiagnoseContent() {
       {phase === 'category' && (
         <section>
           <div style={{ marginBottom: '14px' }}>
-            <h2 style={{ fontSize: '20px', fontWeight: 800 }}>Select Equipment Domain</h2>
+            <h2 style={{ fontSize: '18px', fontWeight: 800 }}>Select Equipment Domain</h2>
             <p style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
               Choose the category of device having trouble.
             </p>
@@ -293,15 +276,15 @@ function DiagnoseContent() {
         <section>
           <div style={{ marginBottom: '14px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
-              <span style={{ fontSize: '20px' }}>{currentCategoryInfo.icon}</span>
-              <h2 style={{ fontSize: '20px', fontWeight: 800 }}>What are you troubleshooting?</h2>
+              <span style={{ fontSize: '18px' }}>{currentCategoryInfo.icon}</span>
+              <h2 style={{ fontSize: '18px', fontWeight: 800 }}>What are you troubleshooting?</h2>
             </div>
             <p style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
-              Select the exact component, or choose &ldquo;I don&rsquo;t know&rdquo; to have the AI identify it.
+              Select component, or choose &ldquo;I don&rsquo;t know&rdquo; for AI identification.
             </p>
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
             {currentCategoryInfo.items.map((item, idx) => (
               <button
                 key={idx}
@@ -317,7 +300,7 @@ function DiagnoseContent() {
                 id={`equip-item-${idx}`}
               >
                 <span>{item}</span>
-                <ChevronRight size={16} color="var(--text-muted)" />
+                <ChevronRight size={14} color="var(--text-muted)" />
               </button>
             ))}
           </div>
@@ -331,9 +314,9 @@ function DiagnoseContent() {
             <span className="badge badge-solar" style={{ marginBottom: '6px' }}>
               {equipmentType || currentCategoryInfo.name}
             </span>
-            <h2 style={{ fontSize: '20px', fontWeight: 800 }}>Describe what is happening</h2>
+            <h2 style={{ fontSize: '18px', fontWeight: 800 }}>Describe what is happening</h2>
             <p style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
-              Be as specific as you can. Mention noises, lights, and when it occurred.
+              Be specific about noises, lights, and timing.
             </p>
           </div>
 
@@ -348,17 +331,17 @@ function DiagnoseContent() {
             />
           </div>
 
-          {/* Structured Questions Layer */}
-          <div className="fix-card" style={{ background: 'var(--bg-secondary)', marginBottom: '16px' }}>
-            <h4 style={{ fontSize: '13px', fontWeight: 700, marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <Sparkles size={14} color="var(--accent-cyan)" />
-              <span>Quick Technical Context</span>
+          {/* Flat Structured Questions Box */}
+          <div className="fix-card" style={{ background: 'var(--bg-secondary)', marginBottom: '14px' }}>
+            <h4 style={{ fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', fontFamily: 'var(--font-mono)', letterSpacing: '0.04em', color: 'var(--emerald-light)', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <Sparkles size={13} />
+              <span>Quick Technical Assessment</span>
             </h4>
 
             {/* Q1: Power Status */}
-            <div style={{ marginBottom: '12px' }}>
-              <label style={{ fontSize: '12px', color: 'var(--text-secondary)', display: 'block', marginBottom: '6px' }}>
-                Is the device powered on / showing any power?
+            <div style={{ marginBottom: '10px' }}>
+              <label style={{ fontSize: '11px', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px', textTransform: 'uppercase', fontFamily: 'var(--font-mono)' }}>
+                Is the device powered on?
               </label>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '6px' }}>
                 {['Yes', 'No', "Don't know"].map((opt) => (
@@ -367,7 +350,7 @@ function DiagnoseContent() {
                     type="button"
                     onClick={() => setStructuredAnswers({ ...structuredAnswers, isPowered: opt })}
                     className={`btn btn-secondary ${structuredAnswers.isPowered === opt ? 'btn-primary' : ''}`}
-                    style={{ fontSize: '12px', padding: '6px', minHeight: '36px' }}
+                    style={{ fontSize: '11px', padding: '6px', minHeight: '34px' }}
                   >
                     {opt}
                   </button>
@@ -376,9 +359,9 @@ function DiagnoseContent() {
             </div>
 
             {/* Q2: Indicator Lights */}
-            <div style={{ marginBottom: '12px' }}>
-              <label style={{ fontSize: '12px', color: 'var(--text-secondary)', display: 'block', marginBottom: '6px' }}>
-                Are there any indicator lights or screen active?
+            <div style={{ marginBottom: '10px' }}>
+              <label style={{ fontSize: '11px', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px', textTransform: 'uppercase', fontFamily: 'var(--font-mono)' }}>
+                Are there indicator lights / active display?
               </label>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '6px' }}>
                 {['Yes', 'No', 'Blinking'].map((opt) => (
@@ -387,7 +370,7 @@ function DiagnoseContent() {
                     type="button"
                     onClick={() => setStructuredAnswers({ ...structuredAnswers, indicatorLights: opt })}
                     className={`btn btn-secondary ${structuredAnswers.indicatorLights === opt ? 'btn-primary' : ''}`}
-                    style={{ fontSize: '12px', padding: '6px', minHeight: '36px' }}
+                    style={{ fontSize: '11px', padding: '6px', minHeight: '34px' }}
                   >
                     {opt}
                   </button>
@@ -397,7 +380,7 @@ function DiagnoseContent() {
 
             {/* Q3: When problem started */}
             <div>
-              <label style={{ fontSize: '12px', color: 'var(--text-secondary)', display: 'block', marginBottom: '6px' }}>
+              <label style={{ fontSize: '11px', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px', textTransform: 'uppercase', fontFamily: 'var(--font-mono)' }}>
                 When did the issue start?
               </label>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '6px' }}>
@@ -407,7 +390,7 @@ function DiagnoseContent() {
                     type="button"
                     onClick={() => setStructuredAnswers({ ...structuredAnswers, whenStarted: opt })}
                     className={`btn btn-secondary ${structuredAnswers.whenStarted === opt ? 'btn-primary' : ''}`}
-                    style={{ fontSize: '12px', padding: '6px', minHeight: '36px' }}
+                    style={{ fontSize: '11px', padding: '6px', minHeight: '34px' }}
                   >
                     {opt}
                   </button>
@@ -424,7 +407,7 @@ function DiagnoseContent() {
             id="continue-to-photos-btn"
           >
             <span>Next: Add Photos</span>
-            <ChevronRight size={18} />
+            <ChevronRight size={16} />
           </button>
         </section>
       )}
@@ -433,22 +416,22 @@ function DiagnoseContent() {
       {phase === 'photos' && (
         <section>
           <div style={{ marginBottom: '14px' }}>
-            <h2 style={{ fontSize: '20px', fontWeight: 800 }}>Add Photos (Recommended)</h2>
+            <h2 style={{ fontSize: '18px', fontWeight: 800 }}>Add Reference Photos</h2>
             <p style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
-              Clear photos of connectors, display screens, labels, and wiring assist the visual reasoning model.
+              Connectors, displays, status LEDs, and labels assist diagnosis.
             </p>
           </div>
 
-          {/* Upload Box */}
+          {/* Flat Upload Box */}
           <div
             className="fix-card"
             style={{
-              border: '2px dashed var(--border-highlight)',
+              border: '1px dashed var(--emerald-border)',
               background: 'var(--bg-input)',
               textAlign: 'center',
-              padding: '24px 16px',
+              padding: '20px 14px',
               cursor: 'pointer',
-              marginBottom: '16px',
+              marginBottom: '12px',
             }}
           >
             <input
@@ -462,56 +445,57 @@ function DiagnoseContent() {
             <label htmlFor="file-upload-input" style={{ cursor: 'pointer', display: 'block' }}>
               <div
                 style={{
-                  width: '54px',
-                  height: '54px',
-                  borderRadius: '50%',
-                  background: 'rgba(0, 210, 255, 0.1)',
-                  color: 'var(--accent-cyan)',
+                  width: '46px',
+                  height: '46px',
+                  borderRadius: 'var(--radius-sm)',
+                  background: 'var(--emerald-subtle)',
+                  border: '1px solid var(--emerald-border)',
+                  color: 'var(--emerald-primary)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  margin: '0 auto 12px auto',
+                  margin: '0 auto 10px auto',
                 }}
               >
-                <Camera size={26} />
+                <Camera size={22} />
               </div>
-              <div style={{ fontWeight: 700, fontSize: '15px', marginBottom: '4px' }}>
-                Take a photo or choose from device
+              <div style={{ fontWeight: 700, fontSize: '14px', marginBottom: '2px' }}>
+                Take photo or upload
               </div>
-              <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
-                PNG, JPG, or WEBP &bull; Camera capture on mobile
+              <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
+                PNG, JPG, or WEBP
               </div>
             </label>
           </div>
 
-          {/* Fast Reference Demo Photo Button */}
-          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '16px' }}>
+          {/* Demo Reference Photo Button */}
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '14px' }}>
             <button
               type="button"
               onClick={addSamplePhoto}
               className="btn btn-secondary"
-              style={{ fontSize: '12px', padding: '6px 12px', minHeight: '34px' }}
+              style={{ fontSize: '11px', padding: '6px 12px', minHeight: '32px' }}
             >
-              <Upload size={14} />
-              <span>Insert Demo Reference Image</span>
+              <Upload size={13} />
+              <span>Use Reference Test Image</span>
             </button>
           </div>
 
           {/* Image Previews */}
           {photos.length > 0 && (
-            <div style={{ marginBottom: '16px' }}>
-              <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '8px' }}>
-                Uploaded Images ({photos.length})
+            <div style={{ marginBottom: '14px' }}>
+              <div style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-secondary)', textTransform: 'uppercase', fontFamily: 'var(--font-mono)', marginBottom: '6px' }}>
+                Attached ({photos.length})
               </div>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '6px' }}>
                 {photos.map((src, i) => (
                   <div
                     key={i}
                     style={{
                       position: 'relative',
-                      borderRadius: 'var(--radius-md)',
+                      borderRadius: 'var(--radius-sm)',
                       overflow: 'hidden',
-                      height: '90px',
+                      height: '80px',
                       border: '1px solid var(--border-subtle)',
                     }}
                   >
@@ -528,10 +512,10 @@ function DiagnoseContent() {
                         position: 'absolute',
                         top: '4px',
                         right: '4px',
-                        background: 'rgba(0, 0, 0, 0.7)',
-                        border: 'none',
+                        background: 'rgba(0, 0, 0, 0.8)',
+                        border: '1px solid #333',
                         color: '#fff',
-                        borderRadius: '50%',
+                        borderRadius: '4px',
                         width: '20px',
                         height: '20px',
                         display: 'flex',
@@ -540,7 +524,7 @@ function DiagnoseContent() {
                         cursor: 'pointer',
                       }}
                     >
-                      <X size={12} />
+                      <X size={11} />
                     </button>
                   </div>
                 ))}
@@ -548,71 +532,68 @@ function DiagnoseContent() {
             </div>
           )}
 
-          {/* Action buttons */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-            <button
-              type="button"
-              onClick={handleStartAnalysis}
-              className="btn btn-primary btn-full"
-              id="start-ai-analysis-btn"
-            >
-              <Sparkles size={18} />
-              <span>Begin AI Diagnostic Process</span>
-            </button>
-          </div>
+          <button
+            type="button"
+            onClick={handleStartAnalysis}
+            className="btn btn-primary btn-full"
+            id="start-ai-analysis-btn"
+          >
+            <Sparkles size={16} />
+            <span>Begin Step-by-Step Diagnosis</span>
+          </button>
         </section>
       )}
 
       {/* PHASE 5: AI ANALYZING SPINNER */}
       {phase === 'analyzing' && (
-        <section style={{ textAlign: 'center', padding: '60px 20px' }}>
+        <section style={{ textAlign: 'center', padding: '50px 16px' }}>
           <div
             style={{
-              width: '60px',
-              height: '60px',
+              width: '48px',
+              height: '48px',
               borderRadius: '50%',
-              border: '3px solid rgba(0, 210, 255, 0.2)',
-              borderTopColor: 'var(--accent-cyan)',
-              animation: 'spin 1s linear infinite',
-              margin: '0 auto 20px auto',
+              border: '2px solid #222222',
+              borderTopColor: 'var(--emerald-primary)',
+              animation: 'spin 0.8s linear infinite',
+              margin: '0 auto 16px auto',
             }}
           />
           <style>{`@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }`}</style>
-          <h3 style={{ fontSize: '18px', fontWeight: 800, marginBottom: '6px' }}>
-            Evaluating Circuit & Symptoms
+          <h3 style={{ fontSize: '16px', fontWeight: 800, marginBottom: '4px' }}>
+            Evaluating Circuit & Safety Constraints
           </h3>
-          <p style={{ fontSize: '13px', color: 'var(--text-secondary)', maxWidth: '380px', margin: '0 auto' }}>
-            Running open-weight diagnostic engine, inspecting safety constraints, and generating hypotheses...
+          <p style={{ fontSize: '12px', color: 'var(--text-secondary)', maxWidth: '360px', margin: '0 auto' }}>
+            Running open-weight diagnostic engine and formulating initial test step...
           </p>
         </section>
       )}
 
-      {/* PHASE 6: INTERACTIVE TROUBLESHOOTING MODE (One test at a time!) */}
+      {/* PHASE 6: INTERACTIVE TROUBLESHOOTING MODE */}
       {phase === 'troubleshooting' && session && (
         <section>
           {/* Header Summary */}
-          <div className="fix-card" style={{ padding: '14px 16px', marginBottom: '14px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+          <div className="fix-card" style={{ padding: '12px 14px', marginBottom: '12px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
               <span className="badge badge-solar">{session.equipmentType}</span>
               <span style={{ fontSize: '11px', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>
                 Step {session.stepsHistory.length + 1}
               </span>
             </div>
 
-            <div style={{ fontSize: '14px', fontWeight: 700, marginBottom: '4px' }}>
+            <div style={{ fontSize: '14px', fontWeight: 700, marginBottom: '2px' }}>
               {session.initialAssessment || 'Troubleshooting Active'}
             </div>
 
             <ConfidenceMeter confidence={session.confidence} showExplanation={false} />
           </div>
 
-          {/* Safety Layer (Priority over troubleshooting) */}
+          {/* Safety Layer */}
           <SafetyBanner level={session.safetyLevel} warnings={session.safetyWarnings} />
 
-          {/* Ranked Hypotheses Accordion */}
+          {/* Ranked Hypotheses */}
           {session.likelyCauses && session.likelyCauses.length > 0 && (
-            <div className="fix-card" style={{ padding: '12px 14px', marginBottom: '14px' }}>
-              <div style={{ fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--text-secondary)', marginBottom: '8px' }}>
+            <div className="fix-card" style={{ padding: '12px 14px', marginBottom: '12px' }}>
+              <div style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', fontFamily: 'var(--font-mono)', color: 'var(--text-secondary)', marginBottom: '8px' }}>
                 Ranked Hypotheses ({session.likelyCauses.length})
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
@@ -623,16 +604,12 @@ function DiagnoseContent() {
                       background: 'var(--bg-secondary)',
                       padding: '8px 10px',
                       borderRadius: 'var(--radius-sm)',
-                      borderLeft: `3px solid ${i === 0 ? 'var(--accent-cyan)' : 'var(--border-subtle)'}`,
+                      borderLeft: `2px solid ${i === 0 ? 'var(--emerald-primary)' : 'var(--border-subtle)'}`,
                     }}
                   >
                     <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', fontWeight: 600 }}>
-                      <span>
-                        {i + 1}. {c.cause}
-                      </span>
-                      <span style={{ fontFamily: 'var(--font-mono)', color: 'var(--text-muted)' }}>
-                        {c.confidence}%
-                      </span>
+                      <span>{i + 1}. {c.cause}</span>
+                      <span style={{ fontFamily: 'var(--font-mono)', color: 'var(--text-muted)' }}>{c.confidence}%</span>
                     </div>
                     <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '2px' }}>
                       {c.explanation}
@@ -643,7 +620,7 @@ function DiagnoseContent() {
             </div>
           )}
 
-          {/* Current Diagnostic Step Container */}
+          {/* Current Step Box */}
           {session.currentStep && (
             <div className="step-container" id="current-diagnostic-step">
               <div className="step-indicator">
@@ -652,7 +629,6 @@ function DiagnoseContent() {
               </div>
 
               <h3 className="step-title">{session.currentStep.title}</h3>
-
               <p className="step-instruction">{session.currentStep.instruction}</p>
 
               {session.currentStep.warning && (
@@ -661,20 +637,20 @@ function DiagnoseContent() {
                     display: 'flex',
                     alignItems: 'center',
                     gap: '6px',
-                    fontSize: '12px',
-                    color: '#fbbf24',
-                    background: 'rgba(245, 158, 11, 0.1)',
+                    fontSize: '11px',
+                    color: 'var(--accent-amber)',
+                    background: 'var(--accent-amber-subtle)',
+                    border: '1px solid var(--accent-amber-border)',
                     padding: '8px 10px',
                     borderRadius: 'var(--radius-sm)',
-                    marginBottom: '16px',
+                    marginBottom: '14px',
                   }}
                 >
-                  <AlertTriangle size={14} />
+                  <AlertTriangle size={13} />
                   <span>{session.currentStep.warning}</span>
                 </div>
               )}
 
-              {/* Multimeter measurement input if step requests it */}
               {session.currentStep.requiresMultimeter && (
                 <MultimeterInput
                   unit={session.currentStep.measurementUnit}
@@ -684,7 +660,6 @@ function DiagnoseContent() {
                 />
               )}
 
-              {/* Standard Options Grid */}
               <div className="step-options-grid">
                 {(session.currentStep.options || ['Yes', 'No', 'Not sure']).map((opt, i) => (
                   <button
@@ -702,21 +677,21 @@ function DiagnoseContent() {
             </div>
           )}
 
-          {/* Evidence Gathered So Far */}
+          {/* Accumulated Evidence */}
           {session.evidence && (session.evidence.confirmed.length > 0 || session.evidence.ruledOut.length > 0) && (
-            <div className="fix-card" style={{ marginTop: '16px', padding: '14px' }}>
-              <div style={{ fontSize: '12px', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '8px' }}>
+            <div className="fix-card" style={{ marginTop: '14px', padding: '12px 14px' }}>
+              <div style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', fontFamily: 'var(--font-mono)', color: 'var(--text-secondary)', marginBottom: '6px' }}>
                 Accumulated Evidence
               </div>
               {session.evidence.confirmed.map((item, i) => (
-                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', color: '#86efac', marginBottom: '4px' }}>
-                  <CheckCircle2 size={13} />
+                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '11px', color: 'var(--emerald-light)', marginBottom: '3px' }}>
+                  <CheckCircle2 size={12} />
                   <span>{item}</span>
                 </div>
               ))}
               {session.evidence.ruledOut.map((item, i) => (
-                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', color: '#fca5a5', marginBottom: '4px' }}>
-                  <X size={13} />
+                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '11px', color: '#fca5a5', marginBottom: '3px' }}>
+                  <X size={12} />
                   <span style={{ textDecoration: 'line-through' }}>{item}</span>
                 </div>
               ))}
@@ -725,7 +700,7 @@ function DiagnoseContent() {
         </section>
       )}
 
-      {/* PHASE 7: DIAGNOSIS RESULT (Solved, Continue, Technician Required) */}
+      {/* PHASE 7: DIAGNOSIS RESULT */}
       {phase === 'result' && session && (
         <section>
           {/* Status Result Hero Card */}
@@ -734,38 +709,34 @@ function DiagnoseContent() {
             style={{
               border:
                 session.status === 'solved'
-                  ? '1px solid #10b981'
+                  ? '1px solid var(--emerald-primary)'
                   : session.status === 'technician_required'
-                  ? '1px solid #ef4444'
-                  : '1px solid #f59e0b',
-              background:
-                session.status === 'solved'
-                  ? 'linear-gradient(180deg, rgba(16, 185, 129, 0.12) 0%, var(--bg-card) 100%)'
-                  : session.status === 'technician_required'
-                  ? 'linear-gradient(180deg, rgba(239, 68, 68, 0.12) 0%, var(--bg-card) 100%)'
-                  : 'linear-gradient(180deg, rgba(245, 158, 11, 0.12) 0%, var(--bg-card) 100%)',
+                  ? '1px solid var(--accent-red)'
+                  : '1px solid var(--accent-amber)',
+              background: 'var(--bg-secondary)',
               textAlign: 'center',
-              padding: '24px 18px',
+              padding: '22px 16px',
             }}
           >
             {session.status === 'solved' && (
               <>
                 <div
                   style={{
-                    width: '54px',
-                    height: '54px',
-                    borderRadius: '50%',
-                    background: 'rgba(16, 185, 129, 0.2)',
-                    color: '#34d399',
+                    width: '46px',
+                    height: '46px',
+                    borderRadius: 'var(--radius-sm)',
+                    background: 'var(--emerald-subtle)',
+                    border: '1px solid var(--emerald-border)',
+                    color: 'var(--emerald-primary)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    margin: '0 auto 12px auto',
+                    margin: '0 auto 10px auto',
                   }}
                 >
-                  <CheckCircle2 size={32} />
+                  <CheckCircle2 size={26} />
                 </div>
-                <h2 style={{ fontSize: '22px', fontWeight: 800, color: '#34d399', marginBottom: '6px' }}>
+                <h2 style={{ fontSize: '20px', fontWeight: 800, color: 'var(--emerald-primary)', marginBottom: '4px' }}>
                   Problem Solved!
                 </h2>
               </>
@@ -775,20 +746,21 @@ function DiagnoseContent() {
               <>
                 <div
                   style={{
-                    width: '54px',
-                    height: '54px',
-                    borderRadius: '50%',
-                    background: 'rgba(239, 68, 68, 0.2)',
+                    width: '46px',
+                    height: '46px',
+                    borderRadius: 'var(--radius-sm)',
+                    background: 'var(--accent-red-subtle)',
+                    border: '1px solid var(--accent-red-border)',
                     color: '#f87171',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    margin: '0 auto 12px auto',
+                    margin: '0 auto 10px auto',
                   }}
                 >
-                  <ShieldAlert size={32} />
+                  <ShieldAlert size={26} />
                 </div>
-                <h2 style={{ fontSize: '22px', fontWeight: 800, color: '#f87171', marginBottom: '6px' }}>
+                <h2 style={{ fontSize: '20px', fontWeight: 800, color: '#f87171', marginBottom: '4px' }}>
                   Professional Assistance Required
                 </h2>
               </>
@@ -798,49 +770,50 @@ function DiagnoseContent() {
               <>
                 <div
                   style={{
-                    width: '54px',
-                    height: '54px',
-                    borderRadius: '50%',
-                    background: 'rgba(245, 158, 11, 0.2)',
+                    width: '46px',
+                    height: '46px',
+                    borderRadius: 'var(--radius-sm)',
+                    background: 'var(--accent-amber-subtle)',
+                    border: '1px solid var(--accent-amber-border)',
                     color: '#fbbf24',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    margin: '0 auto 12px auto',
+                    margin: '0 auto 10px auto',
                   }}
                 >
-                  <Info size={32} />
+                  <Info size={26} />
                 </div>
-                <h2 style={{ fontSize: '22px', fontWeight: 800, color: '#fbbf24', marginBottom: '6px' }}>
+                <h2 style={{ fontSize: '20px', fontWeight: 800, color: '#fbbf24', marginBottom: '4px' }}>
                   Further Testing Needed
                 </h2>
               </>
             )}
 
-            <p style={{ fontSize: '14px', color: 'var(--text-primary)', marginTop: '8px', lineHeight: 1.5 }}>
+            <p style={{ fontSize: '13px', color: 'var(--text-primary)', marginTop: '6px', lineHeight: 1.5 }}>
               {session.resolutionSummary}
             </p>
 
-            <div style={{ marginTop: '14px' }}>
+            <div style={{ marginTop: '12px' }}>
               <ConfidenceMeter confidence={session.confidence} showExplanation={true} />
             </div>
 
             {timerSeconds > 0 && (
               <div style={{ fontSize: '11px', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)', marginTop: '8px' }}>
-                Diagnosis completed in {formatTimer(timerSeconds)}
+                Completed in {formatTimer(timerSeconds)}
               </div>
             )}
           </div>
 
-          {/* Section 16: Safe User Action vs Technician Action */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '14px', marginBottom: '18px' }}>
+          {/* Action Breakdown: Safe User vs Technician */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '10px', marginBottom: '14px' }}>
             {session.safeUserActions && session.safeUserActions.length > 0 && (
-              <div className="fix-card" style={{ margin: 0, borderLeft: '4px solid #10b981' }}>
-                <h4 style={{ fontSize: '13px', fontWeight: 700, color: '#6ee7b7', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <ShieldCheck size={16} />
+              <div className="fix-card" style={{ margin: 0, borderLeft: '3px solid var(--emerald-primary)' }}>
+                <h4 style={{ fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', fontFamily: 'var(--font-mono)', color: 'var(--emerald-light)', marginBottom: '6px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <ShieldCheck size={14} />
                   <span>Safe DIY Checks</span>
                 </h4>
-                <ul style={{ paddingLeft: '20px', fontSize: '12px', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
+                <ul style={{ paddingLeft: '18px', fontSize: '12px', color: 'var(--text-secondary)', lineHeight: 1.55 }}>
                   {session.safeUserActions.map((act, i) => (
                     <li key={i}>{act}</li>
                   ))}
@@ -849,12 +822,12 @@ function DiagnoseContent() {
             )}
 
             {session.technicianActions && session.technicianActions.length > 0 && (
-              <div className="fix-card" style={{ margin: 0, borderLeft: '4px solid #ef4444' }}>
-                <h4 style={{ fontSize: '13px', fontWeight: 700, color: '#fca5a5', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <Wrench size={16} />
+              <div className="fix-card" style={{ margin: 0, borderLeft: '3px solid var(--accent-red)' }}>
+                <h4 style={{ fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', fontFamily: 'var(--font-mono)', color: '#fca5a5', marginBottom: '6px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <Wrench size={14} />
                   <span>Technician Handover Brief</span>
                 </h4>
-                <ul style={{ paddingLeft: '20px', fontSize: '12px', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
+                <ul style={{ paddingLeft: '18px', fontSize: '12px', color: 'var(--text-secondary)', lineHeight: 1.55 }}>
                   {session.technicianActions.map((act, i) => (
                     <li key={i}>{act}</li>
                   ))}
@@ -865,12 +838,14 @@ function DiagnoseContent() {
 
           {/* Evidence Checklist */}
           {session.evidence && session.evidence.confirmed.length > 0 && (
-            <div className="fix-card" style={{ marginBottom: '18px' }}>
-              <h4 style={{ fontSize: '13px', fontWeight: 700, marginBottom: '10px' }}>Diagnostic Evidence Collected</h4>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+            <div className="fix-card" style={{ marginBottom: '14px' }}>
+              <h4 style={{ fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', fontFamily: 'var(--font-mono)', marginBottom: '8px' }}>
+                Diagnostic Evidence Collected
+              </h4>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                 {session.evidence.confirmed.map((ev, i) => (
-                  <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', fontSize: '12px', color: 'var(--text-secondary)' }}>
-                    <CheckCircle2 size={14} color="#34d399" style={{ flexShrink: 0, marginTop: '2px' }} />
+                  <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '6px', fontSize: '12px', color: 'var(--text-secondary)' }}>
+                    <CheckCircle2 size={13} color="var(--emerald-primary)" style={{ flexShrink: 0, marginTop: '2px' }} />
                     <span>{ev}</span>
                   </div>
                 ))}
@@ -879,13 +854,13 @@ function DiagnoseContent() {
           )}
 
           {/* Bottom Actions */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
             <Link
               href={`/diagnosis/${session.id}`}
               className="btn btn-primary btn-full"
               id="view-full-report-btn"
             >
-              <BookmarkCheck size={18} />
+              <BookmarkCheck size={16} />
               <span>Save & View Full Report</span>
             </Link>
 
@@ -897,7 +872,7 @@ function DiagnoseContent() {
               }}
               className="btn btn-secondary btn-full"
             >
-              <RotateCcw size={16} />
+              <RotateCcw size={15} />
               <span>Start Another Diagnosis</span>
             </button>
           </div>

@@ -2,15 +2,11 @@
 
 import React, { useState, useEffect } from 'react';
 import {
-  Settings as SettingsIcon,
   Cpu,
   Shield,
-  Gauge,
   Moon,
   Sun,
   RotateCcw,
-  CheckCircle2,
-  Info,
   Key,
 } from 'lucide-react';
 import { getAppSettings, saveAppSettings, AppSettings, DEFAULT_SETTINGS } from '@/lib/storage';
@@ -44,24 +40,24 @@ export default function SettingsPage() {
 
   return (
     <div style={{ maxWidth: '640px', margin: '0 auto' }}>
-      <div style={{ marginBottom: '16px' }}>
-        <h1 style={{ fontSize: '20px', fontWeight: 800 }}>Application Settings</h1>
+      <div style={{ marginBottom: '14px' }}>
+        <h1 style={{ fontSize: '18px', fontWeight: 800 }}>Application Settings</h1>
         <p style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
           Configure open-weight AI inference, safety protocols, and technical features
         </p>
       </div>
 
       {savedNotice && (
-        <div style={{ background: '#10b981', color: '#fff', fontSize: '12px', padding: '6px 12px', borderRadius: '4px', textAlign: 'center', marginBottom: '14px' }}>
+        <div style={{ background: 'var(--emerald-primary)', color: '#000000', fontWeight: 700, fontSize: '11px', padding: '6px 12px', borderRadius: 'var(--radius-sm)', textAlign: 'center', marginBottom: '12px' }}>
           Preferences updated!
         </div>
       )}
 
       {/* AI Model Configuration */}
       <div className="fix-card">
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
-          <Cpu size={18} color="var(--accent-cyan)" />
-          <h3 style={{ fontSize: '15px', fontWeight: 700 }}>Open-Weight AI Model</h3>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
+          <Cpu size={16} color="var(--emerald-primary)" />
+          <h3 style={{ fontSize: '14px', fontWeight: 700 }}>Open-Weight AI Model</h3>
         </div>
 
         <div className="form-group">
@@ -78,14 +74,14 @@ export default function SettingsPage() {
             <option value="deterministic-engine">Deterministic Offline Diagnostic Engine (Fastest)</option>
           </select>
           <p style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '4px' }}>
-            Uses open-weight instruction-tuned weights with structured JSON schema output for reproducible troubleshooting.
+            Structured JSON schema output ensuring deterministic state progression.
           </p>
         </div>
 
         <div className="form-group" style={{ marginBottom: 0 }}>
           <label className="form-label" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <Key size={13} />
-            <span>External Inference API Key (Optional)</span>
+            <Key size={12} />
+            <span>Inference API Key (Optional)</span>
           </label>
           <input
             type="password"
@@ -95,19 +91,19 @@ export default function SettingsPage() {
             className="form-input"
           />
           <p style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '4px' }}>
-            If omitted, the built-in diagnostic rule and reasoning engine executes locally in real time.
+            If omitted, the local rule and reasoning engine executes in real-time.
           </p>
         </div>
       </div>
 
       {/* Safety & Protocol Preferences */}
       <div className="fix-card">
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
-          <Shield size={18} color="#f59e0b" />
-          <h3 style={{ fontSize: '15px', fontWeight: 700 }}>Safety Guardrails</h3>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
+          <Shield size={16} color="var(--emerald-primary)" />
+          <h3 style={{ fontSize: '14px', fontWeight: 700 }}>Safety Guardrails</h3>
         </div>
 
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
           <div>
             <div style={{ fontSize: '13px', fontWeight: 600 }}>Strict Electrical Safety</div>
             <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
@@ -118,7 +114,7 @@ export default function SettingsPage() {
             type="checkbox"
             checked={settings.strictSafety}
             onChange={(e) => handleChange('strictSafety', e.target.checked)}
-            style={{ width: '18px', height: '18px', cursor: 'pointer' }}
+            style={{ width: '16px', height: '16px', accentColor: 'var(--emerald-primary)', cursor: 'pointer' }}
           />
         </div>
 
@@ -133,35 +129,35 @@ export default function SettingsPage() {
             type="checkbox"
             checked={settings.multimeterMode}
             onChange={(e) => handleChange('multimeterMode', e.target.checked)}
-            style={{ width: '18px', height: '18px', cursor: 'pointer' }}
+            style={{ width: '16px', height: '16px', accentColor: 'var(--emerald-primary)', cursor: 'pointer' }}
           />
         </div>
       </div>
 
       {/* Theme Preference */}
       <div className="fix-card">
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
-          <Moon size={18} color="var(--accent-cyan)" />
-          <h3 style={{ fontSize: '15px', fontWeight: 700 }}>Appearance</h3>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
+          <Moon size={16} color="var(--emerald-primary)" />
+          <h3 style={{ fontSize: '14px', fontWeight: 700 }}>Appearance</h3>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '10px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '8px' }}>
           <button
             type="button"
             onClick={() => handleChange('theme', 'dark')}
             className={`btn btn-secondary ${settings.theme === 'dark' ? 'btn-primary' : ''}`}
-            style={{ minHeight: '40px' }}
+            style={{ minHeight: '38px', fontSize: '13px' }}
           >
-            <Moon size={16} />
-            <span>Dark Slate</span>
+            <Moon size={15} />
+            <span>Black Slate</span>
           </button>
           <button
             type="button"
             onClick={() => handleChange('theme', 'light')}
             className={`btn btn-secondary ${settings.theme === 'light' ? 'btn-primary' : ''}`}
-            style={{ minHeight: '40px' }}
+            style={{ minHeight: '38px', fontSize: '13px' }}
           >
-            <Sun size={16} />
+            <Sun size={15} />
             <span>Clean Light</span>
           </button>
         </div>
@@ -173,10 +169,10 @@ export default function SettingsPage() {
           type="button"
           onClick={handleResetData}
           className="btn btn-secondary"
-          style={{ width: '100%', borderColor: 'rgba(239, 68, 68, 0.3)', color: '#fca5a5' }}
+          style={{ width: '100%', borderColor: 'var(--border-subtle)', color: 'var(--text-muted)', fontSize: '12px' }}
         >
-          <RotateCcw size={15} />
-          <span>Reset Default Hackathon Demo Diagnoses</span>
+          <RotateCcw size={14} />
+          <span>Reset Sample Hackathon Diagnoses</span>
         </button>
       </div>
     </div>

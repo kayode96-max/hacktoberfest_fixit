@@ -22,16 +22,16 @@ export default function MultimeterInput({
   if (hasMultimeter === null) {
     return (
       <div className="multimeter-box">
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
-          <Gauge size={20} color="#38bdf8" />
-          <span style={{ fontSize: '13px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+          <Gauge size={18} color="var(--emerald-primary)" />
+          <span style={{ fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', fontFamily: 'var(--font-mono)' }}>
             Multimeter Measurement Support
           </span>
         </div>
-        <p style={{ fontSize: '13px', color: 'var(--text-secondary)', marginBottom: '14px' }}>
+        <p style={{ fontSize: '13px', color: 'var(--text-secondary)', marginBottom: '12px' }}>
           Do you have a digital multimeter available to take a direct measurement?
         </p>
-        <div style={{ display: 'flex', gap: '10px' }}>
+        <div style={{ display: 'flex', gap: '8px' }}>
           <button
             type="button"
             className="btn btn-secondary"
@@ -65,20 +65,20 @@ export default function MultimeterInput({
     <div className="multimeter-box">
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <Gauge size={20} color="#38bdf8" />
-          <span style={{ fontSize: '13px', fontWeight: 700, textTransform: 'uppercase' }}>
+          <Gauge size={18} color="var(--emerald-primary)" />
+          <span style={{ fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', fontFamily: 'var(--font-mono)' }}>
             Multimeter Input
           </span>
         </div>
-        <span className="badge badge-electrical">{unit}</span>
+        <span className="badge badge-solar">{unit}</span>
       </div>
 
-      <div className="multimeter-lcd" style={{ marginBottom: '12px' }}>
+      <div className="multimeter-lcd" style={{ marginBottom: '10px' }}>
         <span>{val ? val : '00.0'}</span>
-        <span style={{ fontSize: '14px', color: '#335028' }}>{unit}</span>
+        <span style={{ fontSize: '14px', color: 'var(--emerald-dark)' }}>{unit}</span>
       </div>
 
-      <p style={{ fontSize: '11px', color: 'var(--text-muted)', marginBottom: '12px' }}>
+      <p style={{ fontSize: '11px', color: 'var(--text-muted)', marginBottom: '10px' }}>
         {hint}
       </p>
 
@@ -98,21 +98,21 @@ export default function MultimeterInput({
           disabled={!val}
           onClick={handleSubmit}
           className="btn btn-primary"
-          style={{ minWidth: '90px' }}
+          style={{ minWidth: '84px' }}
         >
           Submit
         </button>
       </div>
 
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '10px', color: '#f59e0b' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '10px', color: 'var(--accent-amber)' }}>
           <ShieldAlert size={12} />
           <span>Keep meter in Voltage mode (never test resistance on live circuits)</span>
         </div>
         <button
           type="button"
           onClick={onSkip}
-          style={{ background: 'none', border: 'none', color: 'var(--text-muted)', fontSize: '12px', cursor: 'pointer', textDecoration: 'underline' }}
+          style={{ background: 'none', border: 'none', color: 'var(--text-muted)', fontSize: '11px', cursor: 'pointer', textDecoration: 'underline' }}
         >
           Skip measurement
         </button>

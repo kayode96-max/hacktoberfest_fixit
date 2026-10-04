@@ -15,26 +15,28 @@ export default function ConfidenceMeter({
 }: ConfidenceMeterProps) {
   const clamped = Math.max(5, Math.min(99, confidence));
 
-  let color = '#f59e0b';
+  let color = 'var(--emerald-light)';
   let statusText = 'Working Hypothesis';
 
   if (clamped >= 85) {
-    color = '#10b981';
+    color = 'var(--emerald-primary)';
     statusText = 'High Probability';
   } else if (clamped <= 50) {
-    color = '#64748b';
+    color = 'var(--text-muted)';
     statusText = 'Forming Hypotheses';
   }
 
   return (
     <div className="confidence-wrap">
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '6px' }}>
-        <span style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-secondary)' }}>{label}</span>
+        <span style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.04em', fontFamily: 'var(--font-mono)' }}>
+          {label}
+        </span>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <span style={{ fontSize: '11px', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>
             {statusText}
           </span>
-          <span style={{ fontSize: '14px', fontWeight: 800, color: color, fontFamily: 'var(--font-mono)' }}>
+          <span style={{ fontSize: '13px', fontWeight: 800, color: color, fontFamily: 'var(--font-mono)' }}>
             {clamped}%
           </span>
         </div>
@@ -46,14 +48,13 @@ export default function ConfidenceMeter({
           style={{
             width: `${clamped}%`,
             backgroundColor: color,
-            boxShadow: `0 0 8px ${color}66`,
           }}
         />
       </div>
 
       {showExplanation && (
-        <p style={{ fontSize: '10px', color: 'var(--text-muted)', marginTop: '4px', fontStyle: 'italic' }}>
-          * Estimates hypothesis likelihood based on user-supplied symptoms and tests; does not guarantee laboratory certainty.
+        <p style={{ fontSize: '10px', color: 'var(--text-muted)', marginTop: '4px' }}>
+          * Calculated hypothesis likelihood based on symptoms and test outcomes.
         </p>
       )}
     </div>
