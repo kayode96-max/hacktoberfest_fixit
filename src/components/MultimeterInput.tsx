@@ -112,7 +112,7 @@ export default function MultimeterInput({
         <button
           type="button"
           onClick={onSkip}
-          style={{ background: 'none', border: 'none', color: 'var(--text-muted)', fontSize: '11px', cursor: 'pointer', textDecoration: 'underline' }}
+          style={{ background: 'none', border: 'none', color: '#ffffff', opacity: 0.8, fontSize: '11px', cursor: 'pointer', textDecoration: 'none' }}
         >
           Skip measurement
         </button>

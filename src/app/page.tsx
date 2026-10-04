@@ -11,7 +11,10 @@ import {
   Sparkles,
   ChevronRight,
   Activity,
-  Terminal,
+  Sun,
+  Zap,
+  Cpu,
+  Home as HomeIcon,
 } from 'lucide-react';
 import { CATEGORIES } from '@/lib/diagnosticEngine';
 import { getStoredSessions } from '@/lib/storage';
@@ -29,16 +32,49 @@ export default function HomePage() {
     router.push('/diagnose?demo=solar_generator');
   };
 
+  const getCategoryIcon = (cat: EquipmentCategory) => {
+    switch (cat) {
+      case 'solar':
+        return <Sun size={18} />;
+      case 'electrical':
+        return <Zap size={18} />;
+      case 'electronics':
+        return <Cpu size={18} />;
+      case 'appliances':
+        return <HomeIcon size={18} />;
+    }
+  };
+
   const getCategoryBadge = (cat: EquipmentCategory) => {
     switch (cat) {
       case 'solar':
-        return <span className="badge badge-solar">☀️ Solar</span>;
+        return (
+          <span className="badge badge-solar">
+            <Sun size={12} />
+            <span>Solar</span>
+          </span>
+        );
       case 'electrical':
-        return <span className="badge badge-electrical">⚡ Electrical</span>;
+        return (
+          <span className="badge badge-electrical">
+            <Zap size={12} />
+            <span>Electrical</span>
+          </span>
+        );
       case 'electronics':
-        return <span className="badge badge-electronics">🔌 Electronics</span>;
+        return (
+          <span className="badge badge-electronics">
+            <Cpu size={12} />
+            <span>Electronics</span>
+          </span>
+        );
       case 'appliances':
-        return <span className="badge badge-appliances">🏠 Appliances</span>;
+        return (
+          <span className="badge badge-appliances">
+            <HomeIcon size={12} />
+            <span>Appliances</span>
+          </span>
+        );
     }
   };
 
@@ -79,12 +115,12 @@ export default function HomePage() {
           <span>Open-Weight Technical Troubleshooting</span>
         </div>
 
-        <h1 style={{ fontSize: '26px', fontWeight: 800, letterSpacing: '-0.03em', lineHeight: 1.25, marginBottom: '8px' }}>
+        <h1 style={{ fontSize: '26px', fontWeight: 800, letterSpacing: '-0.03em', lineHeight: 1.25, marginBottom: '8px', color: '#ffffff' }}>
           See it. Describe it.<br />
           <span style={{ color: 'var(--emerald-primary)' }}>Diagnose it. Fix it.</span>
         </h1>
 
-        <p style={{ fontSize: '13px', color: 'var(--text-secondary)', maxWidth: '440px', margin: '0 auto 18px auto', lineHeight: 1.5 }}>
+        <p style={{ fontSize: '14px', color: '#ffffff', maxWidth: '440px', margin: '0 auto 18px auto', lineHeight: 1.5, opacity: 0.9 }}>
           A mobile-first technical assistant that guides you through electrical, solar, and electronics troubleshooting <strong>one step at a time</strong>.
         </p>
 
@@ -94,7 +130,7 @@ export default function HomePage() {
             href="/diagnose"
             className="btn btn-primary btn-full"
             id="start-diagnosis-cta"
-            style={{ fontSize: '15px', padding: '12px 18px' }}
+            style={{ fontSize: '15px', padding: '12px 18px', textDecoration: 'none' }}
           >
             <span>Start New Diagnosis</span>
             <ArrowRight size={17} />
@@ -110,7 +146,7 @@ export default function HomePage() {
               <PlayCircle size={16} color="var(--emerald-primary)" />
               <span>Hackathon Solar Charging Demo</span>
             </h4>
-            <p>
+            <p style={{ color: '#ffffff', opacity: 0.85 }}>
               Test the 2-minute scenario: Solar generator not charging &rarr; Safety checks &rarr; DC breaker resolution.
             </p>
           </div>
@@ -118,7 +154,7 @@ export default function HomePage() {
             type="button"
             onClick={handleQuickDemo}
             className="btn btn-secondary"
-            style={{ whiteSpace: 'nowrap', padding: '8px 12px', fontSize: '12px', borderColor: 'var(--emerald-border)', color: 'var(--emerald-light)' }}
+            style={{ whiteSpace: 'nowrap', padding: '8px 12px', fontSize: '12px', borderColor: 'var(--emerald-border)', color: 'var(--emerald-light)', textDecoration: 'none' }}
           >
             Run Demo
           </button>
@@ -128,7 +164,7 @@ export default function HomePage() {
       {/* Equipment Categories Section */}
       <section>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '8px' }}>
-          <h2 style={{ fontSize: '14px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em', fontFamily: 'var(--font-mono)', color: 'var(--text-secondary)' }}>
+          <h2 style={{ fontSize: '13px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', fontFamily: 'var(--font-mono)', color: '#ffffff' }}>
             Equipment Domains
           </h2>
           <span style={{ fontSize: '11px', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>4 Categories</span>
@@ -141,8 +177,11 @@ export default function HomePage() {
               href={`/diagnose?category=${cat.id}`}
               className="category-card"
               id={`cat-card-${cat.id}`}
+              style={{ textDecoration: 'none' }}
             >
-              <div className="category-icon">{cat.icon}</div>
+              <div className="category-icon-wrap">
+                {getCategoryIcon(cat.id)}
+              </div>
               <div className="category-name">{cat.name}</div>
               <div className="category-desc">{cat.description}</div>
             </Link>
@@ -177,10 +216,10 @@ export default function HomePage() {
               <ShieldCheck size={15} />
             </div>
             <div>
-              <h3 style={{ fontSize: '13px', fontWeight: 700 }}>Built-in Safety Layer</h3>
+              <h3 style={{ fontSize: '13px', fontWeight: 700, color: '#ffffff' }}>Built-in Safety Layer</h3>
             </div>
           </div>
-          <p style={{ fontSize: '12px', color: 'var(--text-secondary)', lineHeight: 1.45 }}>
+          <p style={{ fontSize: '12px', color: '#ffffff', lineHeight: 1.45, opacity: 0.85 }}>
             FixIt AI prioritizes personal safety above diagnosis. When hazards like thermal venting, high voltage, or swollen batteries are detected, testing stops and a structured technician handover brief is produced.
           </p>
         </div>
@@ -189,7 +228,7 @@ export default function HomePage() {
       {/* Recent Diagnoses Section */}
       <section>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '8px' }}>
-          <h2 style={{ fontSize: '14px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em', fontFamily: 'var(--font-mono)', color: 'var(--text-secondary)' }}>
+          <h2 style={{ fontSize: '13px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', fontFamily: 'var(--font-mono)', color: '#ffffff' }}>
             Recent Sessions
           </h2>
           <Link href="/history" style={{ fontSize: '12px', color: 'var(--emerald-primary)', textDecoration: 'none', fontWeight: 600 }}>
@@ -200,7 +239,7 @@ export default function HomePage() {
         {recentSessions.length === 0 ? (
           <div className="fix-card" style={{ textAlign: 'center', padding: '24px 16px' }}>
             <Activity size={24} color="var(--text-muted)" style={{ margin: '0 auto 6px auto' }} />
-            <p style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>No previous diagnoses yet.</p>
+            <p style={{ fontSize: '13px', color: '#ffffff' }}>No previous diagnoses yet.</p>
           </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
@@ -209,7 +248,7 @@ export default function HomePage() {
                 key={s.id}
                 href={`/diagnosis/${s.id}`}
                 className="fix-card interactive"
-                style={{ padding: '12px 14px', margin: 0 }}
+                style={{ padding: '12px 14px', margin: 0, textDecoration: 'none' }}
                 id={`session-card-${s.id}`}
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
@@ -222,14 +261,15 @@ export default function HomePage() {
                   </span>
                 </div>
 
-                <div style={{ fontWeight: 700, fontSize: '14px', marginBottom: '2px' }}>
+                <div style={{ fontWeight: 700, fontSize: '14px', marginBottom: '2px', color: '#ffffff' }}>
                   {s.equipmentType}
                 </div>
 
                 <div
                   style={{
                     fontSize: '12px',
-                    color: 'var(--text-secondary)',
+                    color: '#ffffff',
+                    opacity: 0.85,
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
                     whiteSpace: 'nowrap',
@@ -254,7 +294,7 @@ export default function HomePage() {
 
       {/* Tagline */}
       <footer style={{ textAlign: 'center', padding: '14px 0 6px 0', borderTop: '1px solid var(--border-subtle)' }}>
-        <p style={{ fontSize: '12px', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>
+        <p style={{ fontSize: '12px', color: '#ffffff', fontFamily: 'var(--font-mono)', opacity: 0.75 }}>
           &ldquo;Don&rsquo;t just ask AI what&rsquo;s wrong. Let AI help you find out.&rdquo;
         </p>
       </footer>

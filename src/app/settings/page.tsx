@@ -41,8 +41,8 @@ export default function SettingsPage() {
   return (
     <div style={{ maxWidth: '640px', margin: '0 auto' }}>
       <div style={{ marginBottom: '14px' }}>
-        <h1 style={{ fontSize: '18px', fontWeight: 800 }}>Application Settings</h1>
-        <p style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
+        <h1 style={{ fontSize: '18px', fontWeight: 800, color: '#ffffff' }}>Application Settings</h1>
+        <p style={{ fontSize: '13px', color: '#ffffff', opacity: 0.85 }}>
           Configure open-weight AI inference, safety protocols, and technical features
         </p>
       </div>
@@ -57,29 +57,29 @@ export default function SettingsPage() {
       <div className="fix-card">
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
           <Cpu size={16} color="var(--emerald-primary)" />
-          <h3 style={{ fontSize: '14px', fontWeight: 700 }}>Open-Weight AI Model</h3>
+          <h3 style={{ fontSize: '14px', fontWeight: 700, color: '#ffffff' }}>Open-Weight AI Model</h3>
         </div>
 
         <div className="form-group">
-          <label className="form-label">Inference Engine</label>
+          <label className="form-label" style={{ color: '#ffffff' }}>Inference Engine</label>
           <select
             value={settings.aiModel}
             onChange={(e) => handleChange('aiModel', e.target.value)}
             className="form-input"
-            style={{ cursor: 'pointer' }}
+            style={{ cursor: 'pointer', color: '#ffffff' }}
           >
-            <option value="gemma-2-9b-it">Google Gemma-2 9B-IT (Recommended - Open Weight)</option>
-            <option value="gemma-2-27b-it">Google Gemma-2 27B-IT (Deep Diagnostic Reasoning)</option>
-            <option value="llama-3.1-8b-instruct">Meta Llama 3.1 8B Instruct</option>
-            <option value="deterministic-engine">Deterministic Offline Diagnostic Engine (Fastest)</option>
+            <option value="gemma-2-9b-it" style={{ background: '#111', color: '#fff' }}>Google Gemma-2 9B-IT (Recommended - Open Weight)</option>
+            <option value="gemma-2-27b-it" style={{ background: '#111', color: '#fff' }}>Google Gemma-2 27B-IT (Deep Diagnostic Reasoning)</option>
+            <option value="llama-3.1-8b-instruct" style={{ background: '#111', color: '#fff' }}>Meta Llama 3.1 8B Instruct</option>
+            <option value="deterministic-engine" style={{ background: '#111', color: '#fff' }}>Deterministic Offline Diagnostic Engine (Fastest)</option>
           </select>
-          <p style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '4px' }}>
+          <p style={{ fontSize: '11px', color: '#ffffff', opacity: 0.75, marginTop: '4px' }}>
             Structured JSON schema output ensuring deterministic state progression.
           </p>
         </div>
 
         <div className="form-group" style={{ marginBottom: 0 }}>
-          <label className="form-label" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <label className="form-label" style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#ffffff' }}>
             <Key size={12} />
             <span>Inference API Key (Optional)</span>
           </label>
@@ -89,8 +89,9 @@ export default function SettingsPage() {
             value={settings.apiKey || ''}
             onChange={(e) => handleChange('apiKey', e.target.value)}
             className="form-input"
+            style={{ color: '#ffffff' }}
           />
-          <p style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '4px' }}>
+          <p style={{ fontSize: '11px', color: '#ffffff', opacity: 0.75, marginTop: '4px' }}>
             If omitted, the local rule and reasoning engine executes in real-time.
           </p>
         </div>
@@ -100,13 +101,13 @@ export default function SettingsPage() {
       <div className="fix-card">
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
           <Shield size={16} color="var(--emerald-primary)" />
-          <h3 style={{ fontSize: '14px', fontWeight: 700 }}>Safety Guardrails</h3>
+          <h3 style={{ fontSize: '14px', fontWeight: 700, color: '#ffffff' }}>Safety Guardrails</h3>
         </div>
 
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
           <div>
-            <div style={{ fontSize: '13px', fontWeight: 600 }}>Strict Electrical Safety</div>
-            <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
+            <div style={{ fontSize: '13px', fontWeight: 600, color: '#ffffff' }}>Strict Electrical Safety</div>
+            <div style={{ fontSize: '11px', color: '#ffffff', opacity: 0.75 }}>
               Automatically halts DIY troubleshooting whenever mains voltage or chemical hazard is detected
             </div>
           </div>
@@ -120,8 +121,8 @@ export default function SettingsPage() {
 
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div>
-            <div style={{ fontSize: '13px', fontWeight: 600 }}>Multimeter Support</div>
-            <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
+            <div style={{ fontSize: '13px', fontWeight: 600, color: '#ffffff' }}>Multimeter Support</div>
+            <div style={{ fontSize: '11px', color: '#ffffff', opacity: 0.75 }}>
               Enable direct voltage, current, and resistance measurement prompts
             </div>
           </div>
@@ -138,7 +139,7 @@ export default function SettingsPage() {
       <div className="fix-card">
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
           <Moon size={16} color="var(--emerald-primary)" />
-          <h3 style={{ fontSize: '14px', fontWeight: 700 }}>Appearance</h3>
+          <h3 style={{ fontSize: '14px', fontWeight: 700, color: '#ffffff' }}>Appearance</h3>
         </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '8px' }}>
@@ -146,7 +147,7 @@ export default function SettingsPage() {
             type="button"
             onClick={() => handleChange('theme', 'dark')}
             className={`btn btn-secondary ${settings.theme === 'dark' ? 'btn-primary' : ''}`}
-            style={{ minHeight: '38px', fontSize: '13px' }}
+            style={{ minHeight: '38px', fontSize: '13px', textDecoration: 'none' }}
           >
             <Moon size={15} />
             <span>Black Slate</span>
@@ -155,7 +156,7 @@ export default function SettingsPage() {
             type="button"
             onClick={() => handleChange('theme', 'light')}
             className={`btn btn-secondary ${settings.theme === 'light' ? 'btn-primary' : ''}`}
-            style={{ minHeight: '38px', fontSize: '13px' }}
+            style={{ minHeight: '38px', fontSize: '13px', textDecoration: 'none' }}
           >
             <Sun size={15} />
             <span>Clean Light</span>
@@ -169,7 +170,7 @@ export default function SettingsPage() {
           type="button"
           onClick={handleResetData}
           className="btn btn-secondary"
-          style={{ width: '100%', borderColor: 'var(--border-subtle)', color: 'var(--text-muted)', fontSize: '12px' }}
+          style={{ width: '100%', borderColor: 'var(--border-subtle)', color: '#ffffff', opacity: 0.8, fontSize: '12px', textDecoration: 'none' }}
         >
           <RotateCcw size={14} />
           <span>Reset Sample Hackathon Diagnoses</span>

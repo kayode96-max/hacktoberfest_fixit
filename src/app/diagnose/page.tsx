@@ -19,6 +19,10 @@ import {
   Info,
   Wrench,
   BookmarkCheck,
+  Sun,
+  Zap,
+  Cpu,
+  Home as HomeIcon,
 } from 'lucide-react';
 import { CATEGORIES } from '@/lib/diagnosticEngine';
 import { saveSession } from '@/lib/storage';
@@ -91,6 +95,19 @@ function DiagnoseContent() {
   }, [timerActive]);
 
   const currentCategoryInfo = CATEGORIES.find((c) => c.id === selectedCategory) || CATEGORIES[0];
+
+  const getCategoryIcon = (catId: EquipmentCategory) => {
+    switch (catId) {
+      case 'solar':
+        return <Sun size={18} />;
+      case 'electrical':
+        return <Zap size={18} />;
+      case 'electronics':
+        return <Cpu size={18} />;
+      case 'appliances':
+        return <HomeIcon size={18} />;
+    }
+  };
 
   const handleSelectCategory = (catId: EquipmentCategory) => {
     setSelectedCategory(catId);
@@ -214,12 +231,13 @@ function DiagnoseContent() {
           }}
           className="icon-btn"
           title="Back"
+          style={{ textDecoration: 'none' }}
         >
           <ArrowLeft size={16} />
         </button>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <span style={{ fontSize: '11px', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>
+          <span style={{ fontSize: '11px', color: '#ffffff', opacity: 0.8, fontFamily: 'var(--font-mono)' }}>
             Diagnosis Flow
           </span>
           {timerActive && (
@@ -248,8 +266,8 @@ function DiagnoseContent() {
       {phase === 'category' && (
         <section>
           <div style={{ marginBottom: '14px' }}>
-            <h2 style={{ fontSize: '18px', fontWeight: 800 }}>Select Equipment Domain</h2>
-            <p style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
+            <h2 style={{ fontSize: '18px', fontWeight: 800, color: '#ffffff' }}>Select Equipment Domain</h2>
+            <p style={{ fontSize: '13px', color: '#ffffff', opacity: 0.85 }}>
               Choose the category of device having trouble.
             </p>
           </div>
@@ -262,7 +280,9 @@ function DiagnoseContent() {
                 className={`category-card ${selectedCategory === cat.id ? 'selected' : ''}`}
                 id={`wizard-cat-${cat.id}`}
               >
-                <div className="category-icon">{cat.icon}</div>
+                <div className="category-icon-wrap">
+                  {getCategoryIcon(cat.id)}
+                </div>
                 <div className="category-name">{cat.name}</div>
                 <div className="category-desc">{cat.description}</div>
               </div>
@@ -275,11 +295,13 @@ function DiagnoseContent() {
       {phase === 'equipment' && (
         <section>
           <div style={{ marginBottom: '14px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
-              <span style={{ fontSize: '18px' }}>{currentCategoryInfo.icon}</span>
-              <h2 style={{ fontSize: '18px', fontWeight: 800 }}>What are you troubleshooting?</h2>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+              <div className="category-icon-wrap" style={{ width: '28px', height: '28px', margin: 0 }}>
+                {getCategoryIcon(selectedCategory)}
+              </div>
+              <h2 style={{ fontSize: '18px', fontWeight: 800, color: '#ffffff' }}>What are you troubleshooting?</h2>
             </div>
-            <p style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
+            <p style={{ fontSize: '13px', color: '#ffffff', opacity: 0.85 }}>
               Select component, or choose &ldquo;I don&rsquo;t know&rdquo; for AI identification.
             </p>
           </div>
@@ -296,11 +318,13 @@ function DiagnoseContent() {
                   display: 'flex',
                   justifyContent: 'space-between',
                   alignItems: 'center',
+                  textDecoration: 'none',
+                  color: '#ffffff',
                 }}
                 id={`equip-item-${idx}`}
               >
                 <span>{item}</span>
-                <ChevronRight size={14} color="var(--text-muted)" />
+                <ChevronRight size={14} color="var(--emerald-light)" />
               </button>
             ))}
           </div>
@@ -314,8 +338,8 @@ function DiagnoseContent() {
             <span className="badge badge-solar" style={{ marginBottom: '6px' }}>
               {equipmentType || currentCategoryInfo.name}
             </span>
-            <h2 style={{ fontSize: '18px', fontWeight: 800 }}>Describe what is happening</h2>
-            <p style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
+            <h2 style={{ fontSize: '18px', fontWeight: 800, color: '#ffffff' }}>Describe what is happening</h2>
+            <p style={{ fontSize: '13px', color: '#ffffff', opacity: 0.85 }}>
               Be specific about noises, lights, and timing.
             </p>
           </div>
@@ -331,7 +355,7 @@ function DiagnoseContent() {
             />
           </div>
 
-          {/* Flat Structured Questions Box */}
+          {/* Structured Questions Box */}
           <div className="fix-card" style={{ background: 'var(--bg-secondary)', marginBottom: '14px' }}>
             <h4 style={{ fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', fontFamily: 'var(--font-mono)', letterSpacing: '0.04em', color: 'var(--emerald-light)', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '6px' }}>
               <Sparkles size={13} />
@@ -340,7 +364,7 @@ function DiagnoseContent() {
 
             {/* Q1: Power Status */}
             <div style={{ marginBottom: '10px' }}>
-              <label style={{ fontSize: '11px', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px', textTransform: 'uppercase', fontFamily: 'var(--font-mono)' }}>
+              <label style={{ fontSize: '11px', color: '#ffffff', display: 'block', marginBottom: '4px', textTransform: 'uppercase', fontFamily: 'var(--font-mono)' }}>
                 Is the device powered on?
               </label>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '6px' }}>
@@ -350,7 +374,7 @@ function DiagnoseContent() {
                     type="button"
                     onClick={() => setStructuredAnswers({ ...structuredAnswers, isPowered: opt })}
                     className={`btn btn-secondary ${structuredAnswers.isPowered === opt ? 'btn-primary' : ''}`}
-                    style={{ fontSize: '11px', padding: '6px', minHeight: '34px' }}
+                    style={{ fontSize: '11px', padding: '6px', minHeight: '34px', textDecoration: 'none' }}
                   >
                     {opt}
                   </button>
@@ -360,7 +384,7 @@ function DiagnoseContent() {
 
             {/* Q2: Indicator Lights */}
             <div style={{ marginBottom: '10px' }}>
-              <label style={{ fontSize: '11px', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px', textTransform: 'uppercase', fontFamily: 'var(--font-mono)' }}>
+              <label style={{ fontSize: '11px', color: '#ffffff', display: 'block', marginBottom: '4px', textTransform: 'uppercase', fontFamily: 'var(--font-mono)' }}>
                 Are there indicator lights / active display?
               </label>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '6px' }}>
@@ -370,7 +394,7 @@ function DiagnoseContent() {
                     type="button"
                     onClick={() => setStructuredAnswers({ ...structuredAnswers, indicatorLights: opt })}
                     className={`btn btn-secondary ${structuredAnswers.indicatorLights === opt ? 'btn-primary' : ''}`}
-                    style={{ fontSize: '11px', padding: '6px', minHeight: '34px' }}
+                    style={{ fontSize: '11px', padding: '6px', minHeight: '34px', textDecoration: 'none' }}
                   >
                     {opt}
                   </button>
@@ -380,7 +404,7 @@ function DiagnoseContent() {
 
             {/* Q3: When problem started */}
             <div>
-              <label style={{ fontSize: '11px', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px', textTransform: 'uppercase', fontFamily: 'var(--font-mono)' }}>
+              <label style={{ fontSize: '11px', color: '#ffffff', display: 'block', marginBottom: '4px', textTransform: 'uppercase', fontFamily: 'var(--font-mono)' }}>
                 When did the issue start?
               </label>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '6px' }}>
@@ -390,7 +414,7 @@ function DiagnoseContent() {
                     type="button"
                     onClick={() => setStructuredAnswers({ ...structuredAnswers, whenStarted: opt })}
                     className={`btn btn-secondary ${structuredAnswers.whenStarted === opt ? 'btn-primary' : ''}`}
-                    style={{ fontSize: '11px', padding: '6px', minHeight: '34px' }}
+                    style={{ fontSize: '11px', padding: '6px', minHeight: '34px', textDecoration: 'none' }}
                   >
                     {opt}
                   </button>
@@ -405,6 +429,7 @@ function DiagnoseContent() {
             onClick={() => setPhase('photos')}
             className="btn btn-primary btn-full"
             id="continue-to-photos-btn"
+            style={{ textDecoration: 'none' }}
           >
             <span>Next: Add Photos</span>
             <ChevronRight size={16} />
@@ -416,13 +441,13 @@ function DiagnoseContent() {
       {phase === 'photos' && (
         <section>
           <div style={{ marginBottom: '14px' }}>
-            <h2 style={{ fontSize: '18px', fontWeight: 800 }}>Add Reference Photos</h2>
-            <p style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
+            <h2 style={{ fontSize: '18px', fontWeight: 800, color: '#ffffff' }}>Add Reference Photos</h2>
+            <p style={{ fontSize: '13px', color: '#ffffff', opacity: 0.85 }}>
               Connectors, displays, status LEDs, and labels assist diagnosis.
             </p>
           </div>
 
-          {/* Flat Upload Box */}
+          {/* Upload Box */}
           <div
             className="fix-card"
             style={{
@@ -430,7 +455,6 @@ function DiagnoseContent() {
               background: 'var(--bg-input)',
               textAlign: 'center',
               padding: '20px 14px',
-              cursor: 'pointer',
               marginBottom: '12px',
             }}
           >
@@ -459,7 +483,7 @@ function DiagnoseContent() {
               >
                 <Camera size={22} />
               </div>
-              <div style={{ fontWeight: 700, fontSize: '14px', marginBottom: '2px' }}>
+              <div style={{ fontWeight: 700, fontSize: '14px', marginBottom: '2px', color: '#ffffff' }}>
                 Take photo or upload
               </div>
               <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
@@ -474,7 +498,7 @@ function DiagnoseContent() {
               type="button"
               onClick={addSamplePhoto}
               className="btn btn-secondary"
-              style={{ fontSize: '11px', padding: '6px 12px', minHeight: '32px' }}
+              style={{ fontSize: '11px', padding: '6px 12px', minHeight: '32px', textDecoration: 'none' }}
             >
               <Upload size={13} />
               <span>Use Reference Test Image</span>
@@ -484,7 +508,7 @@ function DiagnoseContent() {
           {/* Image Previews */}
           {photos.length > 0 && (
             <div style={{ marginBottom: '14px' }}>
-              <div style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-secondary)', textTransform: 'uppercase', fontFamily: 'var(--font-mono)', marginBottom: '6px' }}>
+              <div style={{ fontSize: '11px', fontWeight: 600, color: '#ffffff', textTransform: 'uppercase', fontFamily: 'var(--font-mono)', marginBottom: '6px' }}>
                 Attached ({photos.length})
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '6px' }}>
@@ -521,7 +545,6 @@ function DiagnoseContent() {
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        cursor: 'pointer',
                       }}
                     >
                       <X size={11} />
@@ -537,6 +560,7 @@ function DiagnoseContent() {
             onClick={handleStartAnalysis}
             className="btn btn-primary btn-full"
             id="start-ai-analysis-btn"
+            style={{ textDecoration: 'none' }}
           >
             <Sparkles size={16} />
             <span>Begin Step-by-Step Diagnosis</span>
@@ -559,10 +583,10 @@ function DiagnoseContent() {
             }}
           />
           <style>{`@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }`}</style>
-          <h3 style={{ fontSize: '16px', fontWeight: 800, marginBottom: '4px' }}>
+          <h3 style={{ fontSize: '16px', fontWeight: 800, marginBottom: '4px', color: '#ffffff' }}>
             Evaluating Circuit & Safety Constraints
           </h3>
-          <p style={{ fontSize: '12px', color: 'var(--text-secondary)', maxWidth: '360px', margin: '0 auto' }}>
+          <p style={{ fontSize: '12px', color: '#ffffff', opacity: 0.85, maxWidth: '360px', margin: '0 auto' }}>
             Running open-weight diagnostic engine and formulating initial test step...
           </p>
         </section>
@@ -580,7 +604,7 @@ function DiagnoseContent() {
               </span>
             </div>
 
-            <div style={{ fontSize: '14px', fontWeight: 700, marginBottom: '2px' }}>
+            <div style={{ fontSize: '14px', fontWeight: 700, marginBottom: '2px', color: '#ffffff' }}>
               {session.initialAssessment || 'Troubleshooting Active'}
             </div>
 
@@ -593,7 +617,7 @@ function DiagnoseContent() {
           {/* Ranked Hypotheses */}
           {session.likelyCauses && session.likelyCauses.length > 0 && (
             <div className="fix-card" style={{ padding: '12px 14px', marginBottom: '12px' }}>
-              <div style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', fontFamily: 'var(--font-mono)', color: 'var(--text-secondary)', marginBottom: '8px' }}>
+              <div style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', fontFamily: 'var(--font-mono)', color: '#ffffff', marginBottom: '8px' }}>
                 Ranked Hypotheses ({session.likelyCauses.length})
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
@@ -607,11 +631,11 @@ function DiagnoseContent() {
                       borderLeft: `2px solid ${i === 0 ? 'var(--emerald-primary)' : 'var(--border-subtle)'}`,
                     }}
                   >
-                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', fontWeight: 600 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', fontWeight: 600, color: '#ffffff' }}>
                       <span>{i + 1}. {c.cause}</span>
-                      <span style={{ fontFamily: 'var(--font-mono)', color: 'var(--text-muted)' }}>{c.confidence}%</span>
+                      <span style={{ fontFamily: 'var(--font-mono)', color: 'var(--emerald-light)' }}>{c.confidence}%</span>
                     </div>
-                    <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '2px' }}>
+                    <div style={{ fontSize: '11px', color: '#ffffff', opacity: 0.8, marginTop: '2px' }}>
                       {c.explanation}
                     </div>
                   </div>
@@ -629,7 +653,9 @@ function DiagnoseContent() {
               </div>
 
               <h3 className="step-title">{session.currentStep.title}</h3>
-              <p className="step-instruction">{session.currentStep.instruction}</p>
+              <p className="step-instruction" style={{ color: '#ffffff', opacity: 0.9 }}>
+                {session.currentStep.instruction}
+              </p>
 
               {session.currentStep.warning && (
                 <div
@@ -669,6 +695,7 @@ function DiagnoseContent() {
                     onClick={() => handleStepResponse(opt)}
                     className="step-option-btn"
                     id={`step-option-${i}`}
+                    style={{ textDecoration: 'none', color: '#ffffff' }}
                   >
                     {opt}
                   </button>
@@ -680,7 +707,7 @@ function DiagnoseContent() {
           {/* Accumulated Evidence */}
           {session.evidence && (session.evidence.confirmed.length > 0 || session.evidence.ruledOut.length > 0) && (
             <div className="fix-card" style={{ marginTop: '14px', padding: '12px 14px' }}>
-              <div style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', fontFamily: 'var(--font-mono)', color: 'var(--text-secondary)', marginBottom: '6px' }}>
+              <div style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', fontFamily: 'var(--font-mono)', color: '#ffffff', marginBottom: '6px' }}>
                 Accumulated Evidence
               </div>
               {session.evidence.confirmed.map((item, i) => (
@@ -790,7 +817,7 @@ function DiagnoseContent() {
               </>
             )}
 
-            <p style={{ fontSize: '13px', color: 'var(--text-primary)', marginTop: '6px', lineHeight: 1.5 }}>
+            <p style={{ fontSize: '13px', color: '#ffffff', marginTop: '6px', lineHeight: 1.5 }}>
               {session.resolutionSummary}
             </p>
 
@@ -799,7 +826,7 @@ function DiagnoseContent() {
             </div>
 
             {timerSeconds > 0 && (
-              <div style={{ fontSize: '11px', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)', marginTop: '8px' }}>
+              <div style={{ fontSize: '11px', color: '#ffffff', opacity: 0.8, fontFamily: 'var(--font-mono)', marginTop: '8px' }}>
                 Completed in {formatTimer(timerSeconds)}
               </div>
             )}
@@ -813,7 +840,7 @@ function DiagnoseContent() {
                   <ShieldCheck size={14} />
                   <span>Safe DIY Checks</span>
                 </h4>
-                <ul style={{ paddingLeft: '18px', fontSize: '12px', color: 'var(--text-secondary)', lineHeight: 1.55 }}>
+                <ul style={{ paddingLeft: '18px', fontSize: '12px', color: '#ffffff', opacity: 0.9, lineHeight: 1.55 }}>
                   {session.safeUserActions.map((act, i) => (
                     <li key={i}>{act}</li>
                   ))}
@@ -827,7 +854,7 @@ function DiagnoseContent() {
                   <Wrench size={14} />
                   <span>Technician Handover Brief</span>
                 </h4>
-                <ul style={{ paddingLeft: '18px', fontSize: '12px', color: 'var(--text-secondary)', lineHeight: 1.55 }}>
+                <ul style={{ paddingLeft: '18px', fontSize: '12px', color: '#ffffff', opacity: 0.9, lineHeight: 1.55 }}>
                   {session.technicianActions.map((act, i) => (
                     <li key={i}>{act}</li>
                   ))}
@@ -839,12 +866,12 @@ function DiagnoseContent() {
           {/* Evidence Checklist */}
           {session.evidence && session.evidence.confirmed.length > 0 && (
             <div className="fix-card" style={{ marginBottom: '14px' }}>
-              <h4 style={{ fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', fontFamily: 'var(--font-mono)', marginBottom: '8px' }}>
+              <h4 style={{ fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', fontFamily: 'var(--font-mono)', marginBottom: '8px', color: '#ffffff' }}>
                 Diagnostic Evidence Collected
               </h4>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                 {session.evidence.confirmed.map((ev, i) => (
-                  <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '6px', fontSize: '12px', color: 'var(--text-secondary)' }}>
+                  <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '6px', fontSize: '12px', color: '#ffffff', opacity: 0.9 }}>
                     <CheckCircle2 size={13} color="var(--emerald-primary)" style={{ flexShrink: 0, marginTop: '2px' }} />
                     <span>{ev}</span>
                   </div>
@@ -859,6 +886,7 @@ function DiagnoseContent() {
               href={`/diagnosis/${session.id}`}
               className="btn btn-primary btn-full"
               id="view-full-report-btn"
+              style={{ textDecoration: 'none' }}
             >
               <BookmarkCheck size={16} />
               <span>Save & View Full Report</span>
@@ -871,6 +899,7 @@ function DiagnoseContent() {
                 setPhase('category');
               }}
               className="btn btn-secondary btn-full"
+              style={{ textDecoration: 'none' }}
             >
               <RotateCcw size={15} />
               <span>Start Another Diagnosis</span>
@@ -884,7 +913,7 @@ function DiagnoseContent() {
 
 export default function DiagnosePage() {
   return (
-    <Suspense fallback={<div style={{ padding: '40px', textAlign: 'center' }}>Loading FixIt AI...</div>}>
+    <Suspense fallback={<div style={{ padding: '40px', textAlign: 'center', color: '#ffffff' }}>Loading FixIt AI...</div>}>
       <DiagnoseContent />
     </Suspense>
   );

@@ -36,11 +36,11 @@ export default function DiagnosisReportPage() {
   if (!session) {
     return (
       <div style={{ textAlign: 'center', padding: '40px 16px' }}>
-        <h3 style={{ fontSize: '16px', fontWeight: 700, marginBottom: '6px' }}>Diagnosis Not Found</h3>
-        <p style={{ fontSize: '13px', color: 'var(--text-secondary)', marginBottom: '14px' }}>
+        <h3 style={{ fontSize: '16px', fontWeight: 700, marginBottom: '6px', color: '#ffffff' }}>Diagnosis Not Found</h3>
+        <p style={{ fontSize: '13px', color: '#ffffff', opacity: 0.85, marginBottom: '14px' }}>
           This session may have been cleared from local storage.
         </p>
-        <Link href="/" className="btn btn-primary">
+        <Link href="/" className="btn btn-primary" style={{ textDecoration: 'none' }}>
           Return to Home
         </Link>
       </div>
@@ -64,15 +64,15 @@ export default function DiagnosisReportPage() {
     <div style={{ maxWidth: '640px', margin: '0 auto' }}>
       {/* Top navigation */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px' }}>
-        <button type="button" onClick={() => router.back()} className="icon-btn" title="Back">
+        <button type="button" onClick={() => router.back()} className="icon-btn" title="Back" style={{ textDecoration: 'none' }}>
           <ArrowLeft size={16} />
         </button>
 
         <div style={{ display: 'flex', gap: '6px' }}>
-          <button type="button" onClick={handleShare} className="icon-btn" title="Copy Summary">
+          <button type="button" onClick={handleShare} className="icon-btn" title="Copy Summary" style={{ textDecoration: 'none' }}>
             <Share2 size={15} />
           </button>
-          <button type="button" onClick={handlePrint} className="icon-btn" title="Print Report">
+          <button type="button" onClick={handlePrint} className="icon-btn" title="Print Report" style={{ textDecoration: 'none' }}>
             <Printer size={15} />
           </button>
         </div>
@@ -93,14 +93,14 @@ export default function DiagnosisReportPage() {
           </span>
         </div>
 
-        <h1 style={{ fontSize: '18px', fontWeight: 800, marginBottom: '4px' }}>{session.equipmentType}</h1>
-        <p style={{ fontSize: '13px', color: 'var(--text-secondary)', marginBottom: '12px', lineHeight: 1.45 }}>
+        <h1 style={{ fontSize: '18px', fontWeight: 800, marginBottom: '4px', color: '#ffffff' }}>{session.equipmentType}</h1>
+        <p style={{ fontSize: '13px', color: '#ffffff', opacity: 0.9, marginBottom: '12px', lineHeight: 1.45 }}>
           {session.problemDescription}
         </p>
 
         <ConfidenceMeter confidence={session.confidence} label="Diagnostic Confidence" />
 
-        <div style={{ display: 'flex', gap: '14px', marginTop: '10px', fontSize: '11px', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>
+        <div style={{ display: 'flex', gap: '14px', marginTop: '10px', fontSize: '11px', color: '#ffffff', opacity: 0.8, fontFamily: 'var(--font-mono)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
             <Clock size={11} />
             <span>{new Date(session.createdAt).toLocaleDateString()}</span>
@@ -120,10 +120,10 @@ export default function DiagnosisReportPage() {
           background: 'var(--bg-secondary)',
         }}
       >
-        <div style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', fontFamily: 'var(--font-mono)', color: 'var(--text-muted)', marginBottom: '4px' }}>
+        <div style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', fontFamily: 'var(--font-mono)', color: 'var(--emerald-light)', marginBottom: '4px' }}>
           Diagnostic Assessment
         </div>
-        <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)', lineHeight: 1.5 }}>
+        <div style={{ fontSize: '13px', fontWeight: 600, color: '#ffffff', lineHeight: 1.5 }}>
           {session.resolutionSummary || session.initialAssessment}
         </div>
       </div>
@@ -135,7 +135,7 @@ export default function DiagnosisReportPage() {
             <ShieldCheck size={14} />
             <span>Safe User Actions</span>
           </h4>
-          <ul style={{ paddingLeft: '18px', fontSize: '12px', color: 'var(--text-secondary)', lineHeight: 1.55 }}>
+          <ul style={{ paddingLeft: '18px', fontSize: '12px', color: '#ffffff', opacity: 0.9, lineHeight: 1.55 }}>
             {session.safeUserActions.map((act, i) => (
               <li key={i}>{act}</li>
             ))}
@@ -149,7 +149,7 @@ export default function DiagnosisReportPage() {
             <Wrench size={14} />
             <span>Technician Handover Brief</span>
           </h4>
-          <ul style={{ paddingLeft: '18px', fontSize: '12px', color: 'var(--text-secondary)', lineHeight: 1.55 }}>
+          <ul style={{ paddingLeft: '18px', fontSize: '12px', color: '#ffffff', opacity: 0.9, lineHeight: 1.55 }}>
             {session.technicianActions.map((act, i) => (
               <li key={i}>{act}</li>
             ))}
@@ -159,12 +159,12 @@ export default function DiagnosisReportPage() {
 
       {/* Step by Step Timeline History */}
       <div className="fix-card">
-        <h4 style={{ fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', fontFamily: 'var(--font-mono)', marginBottom: '10px' }}>
+        <h4 style={{ fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', fontFamily: 'var(--font-mono)', marginBottom: '10px', color: '#ffffff' }}>
           Diagnostic Step Audit Log
         </h4>
 
         {session.stepsHistory.length === 0 ? (
-          <p style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
+          <p style={{ fontSize: '12px', color: '#ffffff', opacity: 0.75 }}>
             Diagnosis resolved during initial safety assessment.
           </p>
         ) : (
@@ -189,10 +189,10 @@ export default function DiagnosisReportPage() {
                     background: 'var(--emerald-primary)',
                   }}
                 />
-                <div style={{ fontSize: '12px', fontWeight: 700, color: 'var(--text-primary)' }}>
+                <div style={{ fontSize: '12px', fontWeight: 700, color: '#ffffff' }}>
                   Step {rec.step.stepNumber}: {rec.step.title}
                 </div>
-                <div style={{ fontSize: '11px', color: 'var(--text-secondary)', margin: '2px 0 4px 0' }}>
+                <div style={{ fontSize: '11px', color: '#ffffff', opacity: 0.8, margin: '2px 0 4px 0' }}>
                   {rec.step.instruction}
                 </div>
                 <div
@@ -219,11 +219,11 @@ export default function DiagnosisReportPage() {
 
       {/* Back to diagnosing / Home */}
       <div style={{ display: 'flex', gap: '8px', marginTop: '14px' }}>
-        <Link href="/diagnose" className="btn btn-primary" style={{ flex: 1 }}>
+        <Link href="/diagnose" className="btn btn-primary" style={{ flex: 1, textDecoration: 'none' }}>
           <RotateCcw size={15} />
           <span>New Diagnosis</span>
         </Link>
-        <Link href="/history" className="btn btn-secondary" style={{ flex: 1 }}>
+        <Link href="/history" className="btn btn-secondary" style={{ flex: 1, textDecoration: 'none' }}>
           <span>View All History</span>
         </Link>
       </div>
